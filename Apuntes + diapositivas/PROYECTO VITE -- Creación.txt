@@ -1,0 +1,7 @@
+PROYECTO VITE -- Creación
+
+[crear] npm create vite@latest --> se selecciona React y Typescript
+[instalar dependencias] npm install
+[arrancar] npm run dev
+
+
