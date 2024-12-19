@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import TodoViewModel from './TodoViewModel';
-import { useTodoViewModel } from './hookViewModel';
+import TodoViewModel from '../viewmodel/TodoViewModel';
+import { useTodoViewModel } from '../viewmodel/hookViewModel';
 
 
 // Creamos una instancia del ViewModel fuera del componente
