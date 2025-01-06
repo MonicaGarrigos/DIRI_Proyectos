@@ -1,19 +1,8 @@
 
-
-export interface items{
-    id:number;
-    nombre:string;
-    descripcion:string;
-    precio: number;
-}
-
-
-const itemsModel: items[]= [
-    {id:1, nombre:'producto 1', descripcion:' desc p1', precio:123},
-    {id:2, nombre:'producto 2', descripcion:' desc p2', precio:3},
-    {id:3, nombre:'producto 3', descripcion:' desc p3', precio:12}
-
-]
-
-
-export default items;
+const itemsModel = [
+    { id: 1, nombre: 'Producto 1', descripcion: 'Desc P1', precio: 123 },
+    { id: 2, nombre: 'Producto 2', descripcion: 'Desc P2', precio: 234 },
+    { id: 3, nombre: 'Producto 3', descripcion: 'Desc P3', precio: 345 },
+  ];
+  
+  export default itemsModel;

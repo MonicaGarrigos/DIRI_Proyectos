@@ -1,11 +1,8 @@
-import Header from "./header";
 
-
-// REQUISITO 3: Página para ruta no encontrada
+// REQUISITO 3 - Página para ruta no encontrada
 
 const NoMatch = (): React.JSX.Element =>
-    <div>
-        <Header />
+    <div className="main-content">
         <h1>Página no encontrada</h1>
     </div>
 

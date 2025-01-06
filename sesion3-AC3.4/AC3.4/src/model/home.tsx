@@ -1,8 +1,6 @@
-import Header from "./header";
 
 const Home = (): React.JSX.Element =>
-    <div>
-        <Header />
+    <div className="main-content">
         <h1>Página principal</h1>
     </div>
 

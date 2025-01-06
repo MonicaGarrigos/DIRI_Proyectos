@@ -50,3 +50,41 @@ nav a{
 nav a.active{
   text-decoration: none;
 }
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #d4d4d4; 
+  color: black;
+  padding: 10px 20px;
+  text-align: left; 
+  box-shadow: 0 4px 6px rgba(18, 18, 18, 0.562);
+  z-index: 1000;
+}
+
+.nav {
+  display: flex;
+  gap: 15px;
+  font-family: 'Arial', sans-serif;
+}
+
+.nav a {
+  color: rgb(70, 70, 70); 
+  text-decoration: none;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.nav a.active {
+  background-color: #001169; 
+  color: white; 
+}
+
+.nav a:hover {
+  background-color: #4c4b4b; 
+  color:white
+}
