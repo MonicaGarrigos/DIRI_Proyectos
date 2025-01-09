@@ -5,30 +5,45 @@ import './App.css';
 function App() {
 
   const [program, setProgram] = useState("UG");
-  const [enrolments, setEnrolments]=useState(0);    // Creamos eventos personalizados en forma de punteros a funciones
-  const handleChangeProgram = (event: ChangeEvent<HTMLSelectElement>) => {
-    setProgram(event.target.value);
-  }
-  const handleChangeEnrolments=(updateEnrolments:number)=>{
-    setEnrolments(updateEnrolments);
+  const [ugEnrolments, setUGEnrolments] = useState(0);
+  const [pgEnrolments, setPGEnrolments] = useState(0);
+  const handleChangeEnrolments = (updateEnrolments: number) => {
+    program == "UG" ? setUGEnrolments(updateEnrolments) : setPGEnrolments(updateEnrolments);
+  };
+  const handleChangeProgram = (event: ChangeEvent<HTMLLIElement>) => {
+    setProgram(event.target.value.toString());
+  };
+  const selectedEnrolments = (): number => {
+    return program == "UG" ? ugEnrolments : pgEnrolments;
   }
 
   return (
     <div className="App">
+      
       <div className="programs">
-
-        <label>Selecciona el tipo de estudio:</label>
+        <ul className="ulEnrol">
+          <li className="parentLabels"
+            onChange={handleChangeProgram}>
+            <input
+              type="radio"
+              value="UG"
+              name="programGroup"
+              defaultChecked
+            />
+            Grado
+            <input
+              type="radio"
+              className="radioSel"
+              value="PG"
+              name="programGroup"
+            />
+            Postgrado
+          </li>
+          <label>Matriculaciones actuales ({program}): {selectedEnrolments()}</label>
+        </ul>
+        <EnrolmentForm chosenProgram={program} onChangeEnrolments={handleChangeEnrolments} currentEnrolments={selectedEnrolments()} />
         
-        <select
-          className="appDropDowns"
-          onChange={handleChangeProgram}
-          value={program}>
-            <option value="UG">Grado</option>
-            <option value="PG">Postgrado</option>
-        </select>
-        <div> Matriculaciones actuales: {enrolments} </div>
       </div>
-      <EnrolmentForm chosenProgram={program} onChangeEnrolments={handleChangeEnrolments} currentEnrolments={enrolments} />
     </div>
   )
 }

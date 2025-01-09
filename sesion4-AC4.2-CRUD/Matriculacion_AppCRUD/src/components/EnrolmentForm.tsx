@@ -1,5 +1,5 @@
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import './EnrolmentForm.css';
 
 
@@ -18,10 +18,13 @@ function EnrolmentForm(props: EnrolmentFormProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [welcomeMessage, setWelcomeMessage] = useState("");
-
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     setWelcomeMessage(`Bienvenido/a ${firstName} ${lastName}`);
     props.onChangeEnrolments(props.currentEnrolments+1);
+    event.currentTarget.reset(); // vaciar el formulario
+    nameInputRef.current?.focus(); // situamos el cursor en el campo fname
     event.preventDefault();         // Cancelamos la recarga de la página 
   }
 
@@ -35,7 +38,9 @@ function EnrolmentForm(props: EnrolmentFormProps) {
         <input
           type="text"
           name="fname"
-          onBlur={(event) => setFirstName(event.target.value)} />  {/* "onBlur" (evento) ---> cuando foco sale de los campos del formulario*/}
+          onBlur={(event) => setFirstName(event.target.value)}
+          ref = {nameInputRef}
+          />  {/* "onBlur" (evento) ---> cuando foco sale de los campos del formulario*/}
 
         <label>Apellidos:</label>
         <input
