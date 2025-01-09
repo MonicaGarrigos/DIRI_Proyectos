@@ -1,0 +1,62 @@
+/* EnrolmentForm.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.enrolForm {
+    max-width: 400px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.enrolForm h2 {
+    margin-bottom: 16px;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.enrolForm label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.enrolForm input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.enrolForm input[type="submit"] {
+    background-color:#0c4679da ;
+    color: #fff;
+    cursor: pointer;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.enrolForm input[type="submit"]:hover {
+    background-color: #3393e8cd;
+}
+
+.enrolForm .message {
+    display: block;
+    margin-top: 16px;
+    font-size: 1.2rem;
+    color: #a4a4a4;
+}
