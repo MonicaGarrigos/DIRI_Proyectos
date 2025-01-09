@@ -2,7 +2,16 @@
 import { FormEvent, useState } from 'react';
 import './EnrolmentForm.css';
 
-function EnrolmentForm() {
+
+
+// ** Para añadir información externa al formulario 
+interface EnrolmentFormProps {
+  chosenProgram: string;
+  currentEnrolments:number;
+  onChangeEnrolments:(updateEnrolments:number)=>void;
+}
+
+function EnrolmentForm(props: EnrolmentFormProps) {
 
 
   // ** Creamos estados para nombre, apellidos y mensaje
@@ -12,6 +21,7 @@ function EnrolmentForm() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     setWelcomeMessage(`Bienvenido/a ${firstName} ${lastName}`);
+    props.onChangeEnrolments(props.currentEnrolments+1);
     event.preventDefault();         // Cancelamos la recarga de la página 
   }
 
@@ -19,9 +29,8 @@ function EnrolmentForm() {
   return (
     <div>
       <form className='enrolForm' onSubmit={handleSubmit}>        {/* "handleSubmit" (evento) ---> Para el envío del formulario */}
-
-        <h2>Datos del estudiante</h2>
-
+        <h2>Datos del estudiante - {props.chosenProgram}</h2>
+      
         <label>Nombre:</label>
         <input
           type="text"
