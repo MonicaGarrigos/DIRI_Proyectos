@@ -11,6 +11,7 @@ initializeIcons();
 interface EnrolListProps {
   student?: Student;
   onStudentRemoved:(student:Student)=>void;
+  onStudentEditing:(student:Student)=>void;
 }
 
 function EnrolList(props: EnrolListProps) {
@@ -63,6 +64,7 @@ function EnrolList(props: EnrolListProps) {
   }
 
   const handleEdit = (item:Student) => {
+    props.onStudentEditing(item);
   }
   
   useEffect(() => {
@@ -74,6 +76,16 @@ function EnrolList(props: EnrolListProps) {
           id: uuidv4(),
         };
         setItems([...items, student]);
+      }else{
+        const studentIndex = items.findIndex(item => item.id === props.student!.id);
+        if(studentIndex !== -1){
+          const updateItems = [...items];
+          updateItems[studentIndex] = {...props.student}; // reemplazar el estudiante
+          setItems(updateItems);
+        }else{
+          //TODO: gestionar mejor en un futuro
+          console.log("No encontramos el estudiante con ID " + studentIndex);
+        }
       }
     }
   }, [props.student]);
