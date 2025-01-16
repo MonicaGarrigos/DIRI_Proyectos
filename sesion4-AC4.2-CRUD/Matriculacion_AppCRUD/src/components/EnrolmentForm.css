@@ -1,5 +1,3 @@
-/* EnrolmentForm.css */
-
 body {
     font-family: 'Arial', sans-serif;
     background-color: #f4f4f4;
@@ -8,18 +6,17 @@ body {
 }
 
 .enrolForm {
-    max-width: 400px;
+    max-width: 350px;
     margin: 20px auto;
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
 }
 
 .enrolForm h2 {
-    margin-bottom: 16px;
-    font-size: 1.5rem;
-    color: #333;
+    text-align: center;
+    color:  #0c4679da;
 }
 
 .enrolForm label {
@@ -34,10 +31,14 @@ body {
     padding: 8px;
     margin-bottom: 16px;
     box-sizing: border-box;
-    border: 1px solid #ccc;
+    border: 1px solid #0c4679da;
+    transition: border-color 0.3s ease;
     border-radius: 4px;
     font-size: 1rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.enrolForm input[type="text"]:focus {
+    border-color: #3393e8cd; 
 }
 
 .enrolForm input[type="submit"] {
