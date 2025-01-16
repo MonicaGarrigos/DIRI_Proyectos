@@ -48,15 +48,18 @@ function EnrolmentForm(props: EnrolmentFormProps) {
         <input
           type="text"
           name="fname"
-          onBlur={(event) => setFirstName(event.target.value)}
+          onChange={(event) => setFirstName(event.target.value)}
           ref = {nameInputRef}
-          />  {/* "onBlur" (evento) ---> cuando foco sale de los campos del formulario*/}
+          value={firstName}
+        />  {/* "onBlur" (evento) ---> cuando foco sale de los campos del formulario*/}
 
         <label>Apellidos:</label>
         <input
           type="text"
           name="lname"
-          onBlur={(event) => setLastName(event.target.value)} />
+          onChange={(event) => setLastName(event.target.value)}
+          value={lastName} 
+        />
 
         <input type="submit" value="Registrar" />
         <label id="studentMsg" className="message">
