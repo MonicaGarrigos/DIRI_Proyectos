@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { MenuItem } from "../entities/entities";
 import FoodOrder from "./FoodOrder";
+import { foodItemsContext } from "../App";
 
 interface FoodsProps {
     foodItems: MenuItem[];
@@ -9,7 +10,7 @@ interface FoodsProps {
 
 function Foods(props: FoodsProps) {
     const [selectedFood, setSelectedFood] = useState<MenuItem | null>(null);
-    
+    const menuITems = useContext(foodItemsContext);
     const handleFoodClick = (food:MenuItem)=>{
         setSelectedFood(food);
     }

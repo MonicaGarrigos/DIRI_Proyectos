@@ -5,6 +5,8 @@ import './App.css'
 import { MenuItem } from './entities/entities';
 import Foods from './components/Foods';
 import React from 'react';
+
+// ** Contexto global 
 export const foodItemsContext = React.createContext<MenuItem[]>([]);
 
 
