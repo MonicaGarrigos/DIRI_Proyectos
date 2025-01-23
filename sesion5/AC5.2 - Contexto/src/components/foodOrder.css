@@ -1,0 +1,12 @@
+
+.food-order-container {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .food-order-container img {
+    width: 200px; 
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
