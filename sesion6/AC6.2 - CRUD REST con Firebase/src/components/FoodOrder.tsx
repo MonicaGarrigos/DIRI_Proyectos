@@ -4,6 +4,8 @@ import { foodItemsContext } from "../App";
 import './foodOrder.css'
 import { database, ref, update } from "../firebaseConfig";
 import { push } from "firebase/database";
+import logger from '../services/logging'; 
+
 interface FoodOrderProps {
   onReturnToMEnu: MouseEventHandler<HTMLButtonElement> | undefined;
   food: MenuItem;
@@ -22,7 +24,7 @@ function FoodOrder(props: FoodOrderProps) {
   const totalPrice = props.food.price * quantity;
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setQuantity(parseInt(event.target.value) || 1);
+    setQuantity(parseInt(event.target.value) );
   };
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +37,13 @@ function FoodOrder(props: FoodOrderProps) {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // no recarga la página
+
+    if (quantity < 0) { // ** Cantidad negativa --> Error boundary
+      const error = new Error("La cantidad no puede ser negativa.");
+      logger.error(error.message); // ** Logging
+      throw error; // ** Lanza el error para que lo capture el ErrorBoundary
+  }
+
     setIsOrdered(true);
     
     // Crear una copia del array menuItems y actualizar la cantidad del item pedido
@@ -93,7 +102,7 @@ function FoodOrder(props: FoodOrderProps) {
             id="quantity"
             value={quantity}
             onChange={handleQuantityChange}
-            min="1"
+         
           />
           <label htmlFor="name">Nombre:</label>
           <input type="text" id="name" value={name} onChange={handleNameChange} required />
