@@ -1,0 +1,110 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #343a40;
+  display:flex;
+  min-height: 100vh;
+  align-items: center;
+  flex-direction: column;
+}
+
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+/* Button Styles */
+.toggleButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.toggleButton:hover {
+  background-color: #0056b3;
+}
+
+/* Title Styles */
+.title {
+  font-size: 24px;
+  margin: 10px 0;
+  color: #343a40;
+}
+
+.subTitle {
+  font-size: 20px;
+  margin: 15px 0;
+  color: #6c757d;
+}
+
+/* List Styles */
+.ulApp, .ulFoods {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.liApp, .liFoods {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 200px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.liApp:hover, .liFoods:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Styles */
+.foodImg {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* Food Details Styles */
+.foodItem {
+  text-align: left;
+}
+
+.foodDesc {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 5px 0;
+}
+
+.foodPrice {
+  font-size: 16px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ulApp, .ulFoods {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .liApp, .liFoods {
+      width: 90%;
+  }
+}

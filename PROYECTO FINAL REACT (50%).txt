@@ -1,0 +1,8 @@
+PROYECTO FINAL REACT (50%)
+
+utilizar redux
+loggins - log
+pruebas unitarias
+manejo de carga diferida
+peticiones asíncronas a backend
+funcional
