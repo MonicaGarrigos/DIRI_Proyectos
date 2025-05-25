@@ -20,4 +20,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app); // Obtiene la instancia de la base de datos
 
-export { database, ref, set, onValue, update }; // Exporta las funciones que voy a usar para almacenar todo los datos en mi bbdd
+
+export { app, database, ref, set, onValue, update }; // Exporta las funciones que voy a usar para almacenar todo los datos en mi bbdd

@@ -3,8 +3,8 @@ import { MenuItem } from "../entities/entities";
 import { foodItemsContext } from "../App";
 import './foodOrder.css'
 import { database, ref, update } from "../firebaseConfig";
-import { push } from "firebase/database";
-import logger from '../services/logging'; 
+import { saveOrder } from "../services/firebaseService";
+import logger from '../services/logging';
 
 interface FoodOrderProps {
   onReturnToMEnu: MouseEventHandler<HTMLButtonElement> | undefined;
@@ -18,13 +18,15 @@ function FoodOrder(props: FoodOrderProps) {
   const [isOrdered, setIsOrdered] = useState(false); // si está pedido
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const menuItems: MenuItem[] = useContext(foodItemsContext);
 
   const totalPrice = props.food.price * quantity;
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setQuantity(parseInt(event.target.value) );
+    setQuantity(parseInt(event.target.value));
   };
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,10 +44,10 @@ function FoodOrder(props: FoodOrderProps) {
       const error = new Error("La cantidad no puede ser negativa.");
       logger.error(error.message); // ** Logging
       throw error; // ** Lanza el error para que lo capture el ErrorBoundary
-  }
+    }
 
     setIsOrdered(true);
-    
+
     // Crear una copia del array menuItems y actualizar la cantidad del item pedido
     const updatedMenuItems = menuItems.map((item) => {
       if (item.id === props.food.id) {
@@ -57,30 +59,40 @@ function FoodOrder(props: FoodOrderProps) {
     props.onUpdateMenuItems(updatedMenuItems);
 
     // ** Actualizar valor cantidad en Firebase 
-    const updates: { [key: string]: any } = {}; 
+    const updates: { [key: string]: any } = {};
     updates[`/menuItems/${props.food.id - 1}/quantity`] = Math.max(0, props.food.quantity - quantity);
     update(ref(database), updates);
 
 
     // ** Guardar el pedido en Firebase
-    const ordersRef=ref(database, 'orders');
     const newOrder = {
-      name:props.food.name,
-      quantity: quantity,
-      phone: phone,
+      name: props.food.name,
+      quantity,
+      phone,
       date: new Date().toISOString(),
       customerName: name,
       product: props.food.id,
-      totalPrice: totalPrice
+      totalPrice
     };
-    push(ordersRef, newOrder).then(()=>{
-      console.log('Pedido agregado con éxito');
-    }).catch((error)=>{
-      console.log('Error al guardar el pedido en Firebase', error);
-    });
+
+    setLoading(true);
+    setError(null);
+
+    saveOrder(newOrder)
+      .then((id) => {
+        logger.info(`Pedido guardado con ID: ${id}`);
+        setIsOrdered(true);
+      })
+      .catch((err) => {
+        logger.error("Error al guardar el pedido en Firebase: " + err.message);
+        setError("No se pudo guardar el pedido. Intenta de nuevo.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
   };
-  
+
 
   return (
     <div className="food-order-container">
@@ -102,13 +114,17 @@ function FoodOrder(props: FoodOrderProps) {
             id="quantity"
             value={quantity}
             onChange={handleQuantityChange}
-         
+
           />
           <label htmlFor="name">Nombre:</label>
           <input type="text" id="name" value={name} onChange={handleNameChange} required />
           <label htmlFor="phone">Teléfono:</label>
           <input type="tel" id="phone" value={phone} onChange={handlePhoneChange} required />
           <p>Total: {totalPrice}€</p>
+          
+          {loading && <p>Guardando pedido...</p>}
+          {error && <p className="error">{error}</p>}
+
           <button type="submit">Enviar pedido</button>
           <button type="button" onClick={props.onReturnToMEnu}>Volver al menú</button>
         </form>
