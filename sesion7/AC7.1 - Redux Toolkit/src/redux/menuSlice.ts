@@ -8,7 +8,7 @@ const menuSlice = createSlice({
   name: 'menu',
   initialState,
   reducers: {
-    setMenu: (state, action: PayloadAction<MenuItem[]>) => {
+    setMenu: (_, action: PayloadAction<MenuItem[]>) => {
       return action.payload
     },
     updateQuantity: (state, action: PayloadAction<{ id: number; quantity: number }>) => {

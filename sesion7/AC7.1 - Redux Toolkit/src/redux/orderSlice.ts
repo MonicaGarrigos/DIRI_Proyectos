@@ -31,7 +31,7 @@ const initialState: OrderState = {
 // Guardar un pedido
 export const addOrder = createAsyncThunk(
   'orders/addOrder',
-  async (order: Order, thunkAPI) => {
+  async (order: Order, _) => {
     const id = await saveOrder(order)
     return { ...order, id }
   }

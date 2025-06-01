@@ -30,7 +30,7 @@ function App() {
     onValue(menuItemsRef, (snapshot) => {
       const data = snapshot.val()
       if (data) {
-        const menuItemsArray: MenuItem[] = Object.entries(data).map(([key, value]) => {
+        const menuItemsArray: MenuItem[] = Object.entries(data).map(([, value]) => {
           if (
             typeof value === 'object' && value !== null &&
             'id' in value && 'name' in value && 'quantity' in value &&
