@@ -1,0 +1,67 @@
+
+.dashboardContainer {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.toggleButton {
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+.projectGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.projectCard {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  border: 2px solid #2196f3;
+  border-radius: 12px;
+  padding: 1rem;
+  width: 100%;
+  max-width: 320px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.projectCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.projectTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.projectDescription {
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+}
+
+.membersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.memberBadge {
+  background-color: #ff9800;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}

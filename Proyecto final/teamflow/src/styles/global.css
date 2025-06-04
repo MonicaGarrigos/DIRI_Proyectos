@@ -1,0 +1,81 @@
+/* ====== Reset básico ====== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ====== Variables globales ====== */
+:root {
+  --primary-color: #3f51b5;
+  --secondary-color: #4caf50;
+  --text-color: #212121;
+  --bg-color: #f9fafb;
+  --card-bg: #ffffff;
+  --border-color: #e0e0e0;
+  --border-radius: 8px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ====== Elementos base ====== */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  background-color: white;
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  border-radius: var(--border-radius);
+}
+
+/* ====== Utilidades ====== */
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.shadow-sm {
+  box-shadow: var(--shadow-sm);
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md);
+}
+
+/* ====== Scrollbar personalizada (opcional) ====== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}

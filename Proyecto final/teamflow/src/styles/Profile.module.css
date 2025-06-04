@@ -1,0 +1,13 @@
+.container {
+  padding: 2rem;
+  background-color: #f5f7fa;
+}
+.avatar {
+  width: 120px;
+  height: 120px;
+  border: 2px solid #4a90e2;
+}
+.info {
+  color: #2f3640;
+  font-weight: 500;
+}

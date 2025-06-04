@@ -1,0 +1,45 @@
+{
+  "login": {
+    "title": "Log in",
+    "button": "Sign in",
+    "switch": "Don't have an account? Register"
+  },
+  "register": {
+    "title": "Create account",
+    "button": "Register",
+    "switch": "Already have an account? Log in"
+  },
+  "form": {
+    "email": "Email",
+    "password": "Password",
+    "firstname": "First name",
+    "lastname": "Last name",
+    "phone": "Phone",
+    "repeatPassword": "Repeat password"
+  },
+  "projectForm": {
+    "title": "Create new project",
+    "name": "Project name",
+    "description": "Description",
+    "submit": "Create"
+  },
+  "profile": {
+    "title": "Profile",
+    "name": "Name",
+    "lastname": "Last name",
+    "email": "Email",
+    "phone": "Phone",
+    "selectPhoto": "Select new photo",
+    "uploadPhoto": "Upload profile picture",
+    "logout": "Log out",
+    "loading": "Loading profile data..."
+  },
+  "authErrors": {
+    "auth/invalid-email": "Invalid email address.",
+    "auth/user-not-found": "No user found with that email.",
+    "auth/wrong-password": "Incorrect password.",
+    "auth/email-already-in-use": "That email is already in use.",
+    "password-mismatch": "Passwords do not match.",
+    "default": "An unexpected error occurred. Please try again."
+  }
+}

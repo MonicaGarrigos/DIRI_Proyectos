@@ -1,0 +1,45 @@
+{
+  "login": {
+    "title": "Iniciar sesión",
+    "button": "Entrar",
+    "switch": "¿No tienes cuenta? Regístrate"
+  },
+  "register": {
+    "title": "Crear cuenta",
+    "button": "Registrarse",
+    "switch": "¿Ya tienes cuenta? Inicia sesión"
+  },
+  "form": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "firstname": "Nombre",
+    "lastname": "Apellido",
+    "phone": "Teléfono",
+    "repeatPassword": "Repetir contraseña"
+  },
+  "projectForm": {
+    "title": "Crear nuevo proyecto",
+    "name": "Nombre del proyecto",
+    "description": "Descripción",
+    "submit": "Crear"
+  },
+  "profile": {
+    "title": "Perfil",
+    "name": "Nombre",
+    "lastname": "Apellido",
+    "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "selectPhoto": "Seleccionar nueva foto",
+    "uploadPhoto": "Subir foto de perfil",
+    "logout": "Cerrar sesión",
+    "loading": "Cargando datos del perfil..."
+  },
+  "authErrors": {
+    "auth/invalid-email": "Correo electrónico no válido.",
+    "auth/user-not-found": "No existe ningún usuario con ese correo.",
+    "auth/wrong-password": "Contraseña incorrecta.",
+    "auth/email-already-in-use": "Ese correo ya está registrado.",
+    "password-mismatch": "Las contraseñas no coinciden.",
+    "default": "Ocurrió un error inesperado. Intenta nuevamente."
+  }
+}

@@ -1,0 +1,13 @@
+.column {
+  background-color: #ffffff;
+  border: 1px solid #dcdde1;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 300px;
+}
+.title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #2f3640;
+}
