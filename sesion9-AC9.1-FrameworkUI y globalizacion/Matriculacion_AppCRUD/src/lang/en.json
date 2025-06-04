@@ -1,0 +1,18 @@
+{
+    "app.languageSelector": "Select language:",
+    "app.label.language": "Browser language",
+    "grade": "Undergraduate",
+    "postgraduate": "Postgraduate",
+    "currentEnrolments": "Current enrolments ({program}): {enrolments}",
+    "studentData": "Student data - {program}",
+    "firstName": "First Name:",
+    "lastName": "Last Name:",
+    "register": "Register",
+    "update": "Update",
+    "cancel": "Cancel",
+    "welcome": "Welcome ",
+    "name": "Name",
+    "surname": "Surname",
+    "studies": "Studies",
+    "actions": "Actions"
+  }
