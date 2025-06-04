@@ -1,0 +1,32 @@
+.order-list {
+  background-color: #fff;
+  padding: 1rem;
+  color: black;
+  margin-top: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 1rem;
+}
+
+.order-list-title {
+  color: #222; 
+}
+
+.order-list-item {
+  color: #222;
+}
+
+.order-list h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.order-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.order-list li {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}

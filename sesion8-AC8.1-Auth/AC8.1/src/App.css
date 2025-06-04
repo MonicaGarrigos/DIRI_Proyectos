@@ -1,0 +1,124 @@
+/* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #343a40;
+  display:flex;
+  min-height: 100vh;
+  align-items: center;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, p, li {
+  color: #f5f5f5;
+}
+
+.App {
+  margin: 6rem 2rem 6rem 2rem;
+  background-color: #121212;
+  color: #f5f5f5;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.top-bar {
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.toggleButton {
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.toggleButton:hover {
+  background-color: #0056b3;
+}
+
+.title {
+  font-size: 24px;
+  margin: 10px 0;
+  color: #343a40;
+}
+
+.subTitle {
+  font-size: 20px;
+  margin: 15px 0;
+  color: #6c757d;
+}
+
+/* List Styles */
+.ulApp, .ulFoods {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.liApp, .liFoods {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 200px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.liApp:hover, .liFoods:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Image Styles */
+.foodImg {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* Food Details Styles */
+.foodItem {
+  text-align: left;
+}
+
+.foodDesc {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 5px 0;
+}
+
+.foodPrice {
+  font-size: 16px;
+  font-weight: bold;
+  color: #28a745;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ulApp, .ulFoods {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .liApp, .liFoods {
+      width: 90%;
+  }
+}

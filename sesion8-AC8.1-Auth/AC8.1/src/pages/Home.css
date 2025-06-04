@@ -1,0 +1,49 @@
+.ulApp {
+  list-style: none;
+  padding: 0;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: row;
+  gap: 1.2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  width: 100%;
+  padding-bottom: 1rem;
+}
+
+.liApp {
+  flex: 0 0 auto;
+  width: 240px;
+  background-color: #1e1e1e;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  scroll-snap-align: start;
+  transition: transform 0.2s ease;
+}
+
+.liApp:hover {
+  transform: scale(1.05);
+}
+
+.menu-image {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.6rem;
+}
+
+.menu-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #f0f0f0;
+  margin-bottom: 0.4rem;
+}
+
+.menu-quantity {
+  color: #00e676;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
