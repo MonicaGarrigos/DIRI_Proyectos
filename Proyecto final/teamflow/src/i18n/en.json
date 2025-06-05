@@ -100,7 +100,21 @@
     "archived": "Project archived.",
     "unarchived": "Project unarchived.",
     "errorArchiving": "Failed to archive the project.",
-    "errorDeleting": "Failed to delete the project."
+    "errorDeleting": "Failed to delete the project.",
+    "backToMain": "Back to main page",
+    "addColumn": "Add column",
+    "newColumnLabel": "Column name",
+    "add": "Add",
+    "cancel": "Cancel",
+    "columns": {
+      "todo": "To do",
+      "inprogress": "In progress",
+      "done": "Completed"
+    },
+    "addTask": "Add task"
+  },
+  "task": {
+    "confirmDelete": "Are you sure you want to delete this task?"
   },
   "dashboard": {
     "title": "Your Projects",

@@ -41,7 +41,21 @@
     "archived": "Proyecto archivado.",
     "unarchived": "Proyecto desarchivado.",
     "errorArchiving": "Error al archivar el proyecto.",
-    "errorDeleting": "Error al eliminar el proyecto."
+    "errorDeleting": "Error al eliminar el proyecto.",
+    "backToMain": "Volver a la página principal",
+    "addColumn": "Añadir columna",
+    "newColumnLabel": "Nombre columna",
+    "add": "Añadir",
+    "cancel": "Cancelar",
+    "columns": {
+      "todo": "Por hacer",
+      "inprogress": "En progreso",
+      "done": "Completadas"
+    },
+    "addTask": "Añadir tarea"
+  },
+  "task": {
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta tarea?"
   },
   "profile": {
     "title": "Perfil",

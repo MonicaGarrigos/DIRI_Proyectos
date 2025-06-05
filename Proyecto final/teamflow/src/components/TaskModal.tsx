@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,7 +6,9 @@ import {
   DialogActions,
   TextField,
   Button,
-  MenuItem
+  MenuItem,
+  Autocomplete,
+  CircularProgress
 } from "@mui/material";
 import { db } from "../firebase/firebase";
 import { ref, push, set, serverTimestamp, update } from "firebase/database";
@@ -32,14 +34,37 @@ const TaskModal: React.FC<Props> = ({
   projectMembers,
   taskToEdit
 }) => {
-  const [title, setTitle] = useState(taskToEdit?.title || "");
-  const [description, setDescription] = useState(taskToEdit?.description || "");
-  const [priority, setPriority] = useState<"low" | "medium" | "high">(taskToEdit?.priority || "medium");
-  const [assignedTo, setAssignedTo] = useState(taskToEdit?.assignedTo || "");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
+  const [assignedTo, setAssignedTo] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (taskToEdit) {
+      setTitle(taskToEdit.title);
+      setDescription(taskToEdit.description || "");
+      setPriority(taskToEdit.priority || "medium");
+      const assignedUsers = taskToEdit.assignedTo
+        ? Array.isArray(taskToEdit.assignedTo)
+          ? taskToEdit.assignedTo
+          : [taskToEdit.assignedTo]
+        : [];
+      const preselected = projectMembers.filter((u) => assignedUsers.includes(u.uid));
+      setAssignedTo(preselected);
+    } else {
+      setTitle("");
+      setDescription("");
+      setPriority("medium");
+      setAssignedTo([]);
+    }
+  }, [taskToEdit, projectMembers]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!projectId || !columnKey || !assignedTo) return;
+    if (!projectId || !columnKey || assignedTo.length === 0) return;
+
+    const assignedUids = assignedTo.map((u) => u.uid);
 
     const taskData = {
       projectId,
@@ -47,11 +72,12 @@ const TaskModal: React.FC<Props> = ({
       description,
       status: columnKey,
       priority,
-      assignedTo,
+      assignedTo: assignedUids,
       createdAt: serverTimestamp()
     };
 
     try {
+      setLoading(true);
       if (taskToEdit?.id) {
         await update(ref(db, `tasks/${taskToEdit.id}`), taskData);
       } else {
@@ -64,16 +90,18 @@ const TaskModal: React.FC<Props> = ({
       setTitle("");
       setDescription("");
       setPriority("medium");
-      setAssignedTo("");
+      setAssignedTo([]);
     } catch (error) {
-      console.error("Error al guardar tarea:", error);
+      console.error("Error saving task:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>{taskToEdit ? "Editar Tarea" : "Nueva Tarea"}</DialogTitle>
+        <DialogTitle>{taskToEdit ? "Editar tarea" : "Nueva tarea"}</DialogTitle>
         <DialogContent>
           <TextField
             label="Título"
@@ -107,25 +135,26 @@ const TaskModal: React.FC<Props> = ({
             <MenuItem value="high">Alta</MenuItem>
           </TextField>
 
-          <TextField
-            select
-            label="Asignar a"
+          <Autocomplete
+            multiple
+            options={projectMembers}
+            getOptionLabel={(option) => option.displayName || option.email}
             value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
-            fullWidth
-            margin="normal"
-            required
-          >
-            {projectMembers.map((user) => (
-              <MenuItem key={user.uid} value={user.uid}>
-                {user.displayName}
-              </MenuItem>
-            ))}
-          </TextField>
+            onChange={(_, value) => setAssignedTo(value)}
+            loading={loading}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Asignar a"
+                margin="normal"
+                placeholder="Selecciona miembros"
+              />
+            )}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancelar</Button>
-          <Button type="submit" variant="contained">
+          <Button type="submit" variant="contained" disabled={loading}>
             {taskToEdit ? "Guardar cambios" : "Crear"}
           </Button>
         </DialogActions>

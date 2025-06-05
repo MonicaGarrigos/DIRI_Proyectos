@@ -17,9 +17,10 @@ import type { User } from "../types/user";
 
 interface Props {
   task: Task;
-  reloadTasks: () => void;
+  reloadTasks?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onMove?: (id: string, direction: "left" | "right") => void; 
 }
 
 const avatarColors = ["#F44336", "#3F51B5", "#4CAF50", "#FF9800", "#9C27B0"];
@@ -50,24 +51,32 @@ const getPriorityColor = (priority: string) => {
   }
 };
 
-const TaskCard: React.FC<Props> = ({ task, reloadTasks, onEdit, onDelete }) => {
-  const [assignedUser, setAssignedUser] = useState<User | null>(null);
+const TaskCard: React.FC<Props> = ({ task, onEdit, onDelete }) => {
+  const [assignedUsers, setAssignedUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      if (task.assignedTo) {
-        const userSnap = await get(ref(db, `users/${task.assignedTo}`));
-        if (userSnap.exists()) {
-          setAssignedUser(userSnap.val());
-        }
-      }
+    const fetchUsers = async () => {
+      const assignedUids = Array.isArray(task.assignedTo)
+        ? task.assignedTo
+        : task.assignedTo
+        ? [task.assignedTo]
+        : [];
+
+      const usersSnap = await get(ref(db, "users"));
+      const usersData = usersSnap.val() || {};
+
+      const fetchedUsers = assignedUids
+        .map((uid) => ({ uid, ...usersData[uid] }))
+        .filter((u) => u.uid && u.displayName);
+
+      setAssignedUsers(fetchedUsers);
     };
-    fetchUser();
+
+    fetchUsers();
   }, [task.assignedTo]);
 
   return (
     <Card sx={{ display: 'flex', mb: 2 }}>
-      {/* Franja lateral para la prioridad */}
       <Box
         sx={{
           width: 6,
@@ -78,7 +87,9 @@ const TaskCard: React.FC<Props> = ({ task, reloadTasks, onEdit, onDelete }) => {
       />
       <CardContent sx={{ flexGrow: 1 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">{task.title}</Typography>
+          <Typography variant="h6" fontWeight={600}>
+            {task.title}
+          </Typography>
           <Box>
             <IconButton onClick={onEdit}>
               <EditIcon />
@@ -88,23 +99,28 @@ const TaskCard: React.FC<Props> = ({ task, reloadTasks, onEdit, onDelete }) => {
             </IconButton>
           </Box>
         </Box>
+
         <Typography variant="body2" color="text.secondary">
           {task.description}
         </Typography>
-        {assignedUser && (
+
+        {assignedUsers.length > 0 && (
           <Box mt={2} display="flex" alignItems="center" gap={1}>
-            <Tooltip title={assignedUser.displayName}>
-              <Avatar
-                sx={{
-                  width: 40,
-                  height: 40,
-                  bgcolor: getColorForUid(assignedUser.uid),
-                  fontSize: "0.9rem"
-                }}
-              >
-                {getInitials(assignedUser.displayName)}
-              </Avatar>
-            </Tooltip>
+            {assignedUsers.map((user) => (
+              <Tooltip key={user.uid} title={user.displayName}>
+                <Avatar
+                  sx={{
+                    width: 36,
+                    height: 36,
+                    bgcolor: getColorForUid(user.uid),
+                    fontSize: "0.85rem",
+                    fontWeight: "bold"
+                  }}
+                >
+                  {getInitials(user.displayName)}
+                </Avatar>
+              </Tooltip>
+            ))}
           </Box>
         )}
       </CardContent>

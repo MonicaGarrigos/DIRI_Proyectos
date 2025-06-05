@@ -5,14 +5,13 @@ import {
   IconButton,
   Button,
   TextField,
-  Stack,
-  Dialog,
-  DialogTitle,
-  DialogContent
+  Stack
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import { useParams, useNavigate } from "react-router-dom";
+import FolderIcon from "@mui/icons-material/Folder";
 import AddIcon from "@mui/icons-material/Add";
+import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import KanbanColumn from "../components/KanbanColumn";
 import TaskModal from "../components/TaskModal";
 import { db } from "../firebase/firebase";
@@ -30,11 +29,12 @@ const ProjectDetail: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [newColumnName, setNewColumnName] = useState("");
   const [addingColumn, setAddingColumn] = useState(false);
-  const navigate = useNavigate();
   const [members, setMembers] = useState<User[]>([]);
-
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!id) return;
@@ -76,27 +76,15 @@ const ProjectDetail: React.FC = () => {
     fetchData();
   }, [id]);
 
-  const handleEdit = (task: Task) => {
-    setEditingTask(task);
-    setIsEditOpen(true);
-  };
-
-  const handleDelete = async (taskId: string) => {
-    const confirmed = window.confirm("¿Estás seguro de que quieres eliminar esta tarea?");
-    if (!confirmed) return;
-    await remove(ref(db, `tasks/${taskId}`));
-    await loadProject();
-  };
-
   const loadProject = async () => {
     const snap = await get(ref(db, `projects/${id}`));
     if (!snap.exists()) return;
     const data = snap.val();
     setProject(data);
     setColumns(data.columns || {
-      todo: "Por hacer",
-      inprogress: "En progreso",
-      done: "Completadas"
+      todo: t("project.columns.todo"),
+      inprogress: t("project.columns.inprogress"),
+      done: t("project.columns.done")
     });
 
     const taskSnap = await get(ref(db, "tasks"));
@@ -114,6 +102,13 @@ const ProjectDetail: React.FC = () => {
     setModalOpen(true);
   };
 
+  const handleRenameColumn = async (key: string, newName: string) => {
+    if (!id) return;
+    const updated = { ...columns, [key]: newName };
+    await update(ref(db, `projects/${id}`), { columns: updated });
+    setColumns(updated);
+  };
+
   const handleAddColumn = async () => {
     if (!id || !newColumnName.trim()) return;
     const key = newColumnName.toLowerCase().replace(/\s+/g, "_");
@@ -124,90 +119,104 @@ const ProjectDetail: React.FC = () => {
     setAddingColumn(false);
   };
 
-  const handleRenameColumn = async (key: string, newName: string) => {
-    if (!id) return;
-    const updated = { ...columns, [key]: newName };
-    await update(ref(db, `projects/${id}`), { columns: updated });
-    setColumns(updated);
+  const handleEdit = (task: Task) => {
+    setEditingTask(task);
+    setIsEditOpen(true);
+  };
+
+  const handleDelete = async (taskId: string) => {
+    const confirmed = window.confirm(t("task.confirmDelete"));
+    if (!confirmed) return;
+    await remove(ref(db, `tasks/${taskId}`));
+    await loadProject();
   };
 
   return (
-    <>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <IconButton onClick={() => navigate('/')}>
+    <Box sx={{ px: 4, py: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+        <IconButton onClick={() => navigate("/")}>
           <ArrowBackIosNewIcon />
         </IconButton>
-        <Typography variant="h6">Volver a la página principal</Typography>
+        <Typography variant="body1" sx={{ ml: 1 }}>
+          {t("project.backToMain")}
+        </Typography>
       </Box>
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>
+
+      <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+        <FolderIcon fontSize="large" />
+        <Typography variant="h4" fontWeight={600}>
           {project?.name}
         </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          {project?.description}
-        </Typography>
+      </Stack>
 
-        <Box display="flex" gap={2} overflow="auto" mt={4} alignItems="flex-start">
-          {Object.entries(columns).map(([key, name]) => (
-            <KanbanColumn
-              key={key}
-              columnKey={key}
-              title={name}
-              tasks={tasks.filter((t) => t.status === key)}
-              onAddTask={() => handleAddTask(key)}
-              onRename={(newName) => handleRenameColumn(key, newName)}
-              reloadTasks={loadProject}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ))}
+      <Typography variant="subtitle1" sx={{ color: "text.secondary", mb: 3 }}>
+        {project?.description}
+      </Typography>
 
-          <Box minWidth={250} flexShrink={0}>
-            {addingColumn ? (
-              <Stack spacing={1}>
-                <TextField
-                  label="Nombre columna"
-                  value={newColumnName}
-                  onChange={(e) => setNewColumnName(e.target.value)}
-                  size="small"
-                />
-                <Button variant="contained" onClick={handleAddColumn}>Añadir</Button>
-                <Button onClick={() => setAddingColumn(false)}>Cancelar</Button>
-              </Stack>
-            ) : (
-              <Button
-                variant="outlined"
-                startIcon={<AddIcon />}
-                onClick={() => setAddingColumn(true)}
-              >
-                Añadir columna
+      <Box display="flex" gap={2} overflow="auto" alignItems="flex-start">
+        {Object.entries(columns).map(([key, name]) => (
+          <KanbanColumn
+            key={key}
+            columnKey={key}
+            title={name}
+            tasks={tasks.filter((t) => t.status === key)}
+            onAddTask={() => handleAddTask(key)}
+            onRename={(newName) => handleRenameColumn(key, newName)}
+            reloadTasks={loadProject}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
+
+        <Box minWidth={250} flexShrink={0}>
+          {addingColumn ? (
+            <Stack spacing={1}>
+              <TextField
+                label={t("project.newColumnLabel")}
+                value={newColumnName}
+                onChange={(e) => setNewColumnName(e.target.value)}
+                size="small"
+              />
+              <Button variant="contained" onClick={handleAddColumn}>
+                {t("project.add")}
               </Button>
-            )}
-          </Box>
+              <Button onClick={() => setAddingColumn(false)}>
+                {t("project.cancel")}
+              </Button>
+            </Stack>
+          ) : (
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={() => setAddingColumn(true)}
+            >
+              {t("project.addColumn")}
+            </Button>
+          )}
         </Box>
-
-        {/* Modal de creación */}
-        <TaskModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          columnKey={selectedColumn}
-          projectId={id!}
-          onTaskCreated={loadProject}
-          projectMembers={members}
-        />
-
-        {/* Modal de edición */}
-        <TaskModal
-          open={isEditOpen}
-          onClose={() => setIsEditOpen(false)}
-          columnKey={editingTask?.status || "todo"}
-          projectId={id!}
-          onTaskCreated={loadProject}
-          projectMembers={members}
-          taskToEdit={editingTask!}
-        />
       </Box>
-    </>
+
+      {/* Crear tarea */}
+      <TaskModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        columnKey={selectedColumn}
+        projectId={id!}
+        onTaskCreated={loadProject}
+        projectMembers={members}
+      />
+
+      {/* Editar tarea */}
+      <TaskModal
+        open={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        columnKey={editingTask?.status || "todo"}
+        projectId={id!}
+        onTaskCreated={loadProject}
+        projectMembers={members}
+        taskToEdit={editingTask!}
+      />
+    </Box>
   );
 };
 
