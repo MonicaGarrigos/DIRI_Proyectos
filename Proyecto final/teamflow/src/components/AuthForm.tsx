@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TextField, Button, Typography, Box } from "@mui/material";
+import { TextField, Button, Box } from "@mui/material";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useAppDispatch } from "../redux/hooks";
@@ -10,6 +10,7 @@ import { get, ref as dbRef } from "firebase/database";
 import { db } from "../firebase/firebase";
 import styles from "../styles/AuthForm.module.css";
 import logo from "../assets/logo_login.png";
+import { Snackbar, Alert } from "@mui/material";
 
 const AuthForm: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,11 +23,30 @@ const AuthForm: React.FC = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!email || !password || (!isLogin && (!firstName || !lastName || !repeatPassword))) {
+      setSnackbar({
+        open: true,
+        message: t("authErrors.missing-fields"),
+        severity: "error",
+      });
+      return;
+    }
+
     if (!isLogin && password !== repeatPassword) {
-      dispatch(setError(t("authErrors.password-mismatch")));
+      setSnackbar({
+        open: true,
+        message: t("authErrors.password-mismatch"),
+        severity: "error",
+      });
       return;
     }
 
@@ -42,7 +62,11 @@ const AuthForm: React.FC = () => {
         const userDB = snap.val();
 
         if (userDB.active === false) {
-          dispatch(setError("Tu cuenta está desactivada. Contacta con un administrador."));
+          setSnackbar({
+            open: true,
+            message: t("authErrors.disabled-account"),
+            severity: "error",
+          });
           return;
         }
 
@@ -54,7 +78,13 @@ const AuthForm: React.FC = () => {
           role: userDB.role,
           active: userDB.active !== false
         }));
-        dispatch(setError(null));
+
+        setSnackbar({
+          open: true,
+          message: t("authSuccess.login"),
+          severity: "success",
+        });
+
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         firebaseUser = userCredential.user;
@@ -68,11 +98,19 @@ const AuthForm: React.FC = () => {
           photoURL: firebaseUser.photoURL || null,
           role: "member"
         }));
-        dispatch(setError(null));
+
+        setSnackbar({
+          open: true,
+          message: t("authSuccess.register"),
+          severity: "success",
+        });
       }
+
+      dispatch(setError(null));
+
     } catch (error: any) {
-      console.error("Error en auth:", error.message);
-      dispatch(setError(error.message));
+      const code = error.code || "unknown";
+      dispatch(setError(code));
     } finally {
       dispatch(setLoading(false));
     }
@@ -189,6 +227,25 @@ const AuthForm: React.FC = () => {
         </Button>
 
       </Box>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          sx={{ width: "100%" }}
+        >
+          {
+            t(`authErrors.${snackbar.message}`) !== `authErrors.${snackbar.message}`
+              ? t(`authErrors.${snackbar.message}`)
+              : snackbar.message
+          }
+        </Alert>
+      </Snackbar>
     </div>
   );
 

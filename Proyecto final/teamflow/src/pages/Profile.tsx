@@ -12,6 +12,7 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase/firebase";
 import { ref as dbRef, get } from "firebase/database";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface UserProfile {
   email: string;
@@ -27,6 +28,7 @@ const Profile: React.FC = () => {
   const reduxUser = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
   const [user, setUserData] = useState<UserProfile | null>(null);
+  const { t } = useTranslation();
 
   const uid = reduxUser?.uid;
   if (!uid) return null;
@@ -62,25 +64,20 @@ const Profile: React.FC = () => {
         >
           {user.firstName?.[0] || user.email?.[0]}
         </Avatar>
-
-        <Typography variant="h5" mt={2} fontWeight={600}>
-          {user.firstName} {user.lastName}
-        </Typography>
-
         <Typography variant="body1" color="textSecondary" mt={1}>
-          <strong>Email:</strong> {user.email}
+          <strong>{t("profile.email")}:</strong> {user.email}
         </Typography>
 
         <Typography variant="body1" color="textSecondary">
-          <strong>Teléfono:</strong> {user.phone || "-"}
+          <strong>{t("profile.phone")}:</strong> {user.phone || "-"}
         </Typography>
 
         <Typography variant="body1" color="textSecondary">
-          <strong>Rol:</strong> {user.role}
+          <strong>{t("profile.role")}:</strong> {t(`roles.${user.role}`)}
         </Typography>
 
         <Typography variant="body1" color={user.active ? "green" : "red"}>
-          <strong>Estado:</strong> {user.active ? "Activo" : "Inactivo"}
+          <strong>{t("profile.status")}:</strong> {t(`status.${user.active ? "active" : "inactive"}`)}
         </Typography>
 
         <Button
@@ -89,8 +86,9 @@ const Profile: React.FC = () => {
           onClick={handleLogout}
           sx={{ mt: 3, borderRadius: 2 }}
         >
-          Cerrar sesión
+          {t("profile.logout")}
         </Button>
+
       </Paper>
     </Box>
   );

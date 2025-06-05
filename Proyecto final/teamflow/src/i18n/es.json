@@ -23,16 +23,44 @@
     "description": "Descripción",
     "submit": "Crear"
   },
+  "project": {
+    "noDescription": "Sin descripción disponible",
+    "memberTooltip": "Miembro: {{uid}}",
+    "membersCount": "{{count}} miembro",
+    "membersCount_plural": "{{count}} miembros",
+    "goalLabel": "Objetivo del proyecto",
+    "archiveLabel": "Archivar proyecto",
+    "unarchive": "Desarchivar proyecto",
+    "viewDetails": "Ver detalles",
+    "edit": "Editar proyecto",
+    "delete": "Eliminar proyecto",
+    "youAreOwner": "Propietario",
+    "created": "Proyecto creado correctamente.",
+    "updated": "Proyecto actualizado correctamente.",
+    "deleted": "Proyecto eliminado.",
+    "archived": "Proyecto archivado.",
+    "unarchived": "Proyecto desarchivado.",
+    "errorArchiving": "Error al archivar el proyecto.",
+    "errorDeleting": "Error al eliminar el proyecto."
+  },
   "profile": {
     "title": "Perfil",
     "name": "Nombre",
     "lastname": "Apellido",
     "email": "Correo electrónico",
     "phone": "Teléfono",
+    "status": "Estado",
+    "role": "Rol",
     "selectPhoto": "Seleccionar nueva foto",
     "uploadPhoto": "Subir foto de perfil",
     "logout": "Cerrar sesión",
-    "loading": "Cargando datos del perfil..."
+    "loading": "Cargando datos del perfil...",
+    "missing-fields": "Completa todos los campos obligatorios.",
+    "disabled-account": "Tu cuenta está desactivada. Contacta con un administrador."
+  },
+  "authSuccess": {
+    "login": "Sesión iniciada con éxito",
+    "register": "Registro completado con éxito"
   },
   "authErrors": {
     "auth/invalid-email": "Correo electrónico no válido.",
@@ -40,7 +68,8 @@
     "auth/wrong-password": "Contraseña incorrecta.",
     "auth/email-already-in-use": "Ese correo ya está registrado.",
     "password-mismatch": "Las contraseñas no coinciden.",
-    "default": "Ocurrió un error inesperado. Intenta nuevamente."
+    "default": "Ocurrió un error inesperado. Intenta nuevamente.",
+    "auth/invalid-credential": "Correo o contraseña incorrectos."
   },
   "admin": {
     "userManagement": "Gestión de Usuarios",
@@ -72,5 +101,13 @@
   },
   "language": {
     "label": "Idioma"
+  },
+  "dashboard": {
+    "title": "Tus proyectos",
+    "newProject": "Nuevo proyecto",
+    "search": "Buscar proyecto",
+    "active": "Activos",
+    "archived": "Archivados",
+    "noResults": "No hay proyectos que coincidan con los filtros actuales."
   }
 }

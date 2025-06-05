@@ -29,6 +29,8 @@
     "lastname": "Last name",
     "email": "Email",
     "phone": "Phone",
+    "status": "Status",
+    "rol": "Rol",
     "selectPhoto": "Select new photo",
     "uploadPhoto": "Upload profile picture",
     "logout": "Log out",
@@ -40,7 +42,14 @@
     "auth/wrong-password": "Incorrect password.",
     "auth/email-already-in-use": "That email is already in use.",
     "password-mismatch": "Passwords do not match.",
-    "default": "An unexpected error occurred. Please try again."
+    "default": "An unexpected error occurred. Please try again.",
+    "missing-fields": "Please complete all required fields.",
+    "auth/invalid-credential": "Invalid email or password.",
+    "disabled-account": "Your account is disabled. Contact an administrator."
+  },
+  "authSuccess": {
+    "login": "Logged in successfully",
+    "register": "Account created successfully"
   },
   "admin": {
     "userManagement": "User Management",
@@ -72,5 +81,33 @@
   },
   "language": {
     "label": "Language"
+  },
+  "project": {
+    "noDescription": "No description available",
+    "memberTooltip": "Member: {{uid}}",
+    "membersCount": "{{count}} member",
+    "membersCount_plural": "{{count}} members",
+    "goalLabel": "Project goal",
+    "archiveLabel": "Archive project",
+    "unarchive": "Unarchive project",
+    "viewDetails": "View details",
+    "edit": "Edit project",
+    "delete": "Delete project",
+    "youAreOwner": "Owner",
+    "created": "Project created successfully.",
+    "updated": "Project updated successfully.",
+    "deleted": "Project deleted.",
+    "archived": "Project archived.",
+    "unarchived": "Project unarchived.",
+    "errorArchiving": "Failed to archive the project.",
+    "errorDeleting": "Failed to delete the project."
+  },
+  "dashboard": {
+    "title": "Your Projects",
+    "newProject": "New Project",
+    "search": "Search project",
+    "active": "Active",
+    "archived": "Archived",
+    "noResults": "No projects match the current filters."
   }
 }
