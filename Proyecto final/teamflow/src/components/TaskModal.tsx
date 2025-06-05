@@ -7,8 +7,7 @@ import {
   TextField,
   Button,
   MenuItem,
-  Autocomplete,
-  CircularProgress
+  Autocomplete
 } from "@mui/material";
 import { db } from "../firebase/firebase";
 import { ref, push, set, serverTimestamp, update } from "firebase/database";

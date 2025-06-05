@@ -1,0 +1,27 @@
+
+
+Realiza una aplicación rica de internet que disponga, al menos de las siguientes caracteristicas:
+
+    Enrutado
+    Autenticación con al menos una zona privada y rutas protegidas
+    Formularios
+    Se evitará hacer una aplicación CRUD, pero la aplicación añadirá, borrará, buscará y editará elementos de base de datos en backend
+        éste se podrá implementar con Firebase o Express con alguna base de datos local
+    Carga diferida
+    Pruebas unitarias
+    Logging
+    Tratamiento adecuado de errores
+    Redux Toolkit
+    Uso de algún framework de UI
+    i18n
+
+
+Se entregará:
+
+     URL en producción (p.ej. GitHub Pages)
+     Código fuente (p.ej. GitHub)
+     PDF o video con capturas de funcionamiento
+    Boceto de la aplicación en Figma
+    Memoria donde describas brevemente cómo has realizado cada una de las partes especificadas en el enunciado.
+
+La actividad se evaluará presencialmente o en una reunión telemática el día que se pubique el examen.
