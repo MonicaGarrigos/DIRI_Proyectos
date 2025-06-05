@@ -19,6 +19,7 @@ import { db } from "../firebase/firebase";
 import ProjectCard from "../components/ProjectCard";
 import ProjectFormModal from "../components/ProjectFormModal";
 import type { Project, ProjectToEdit } from "../types/project";
+import { logError, logInfo } from "../utils/logger";
 
 const Dashboard: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -100,19 +101,30 @@ const Dashboard: React.FC = () => {
     const projectRef = ref(db, `projects/${id}/archived`);
     set(projectRef, !archived)
       .then(() => {
-        showSnackbar(archived ? t("project.unarchived") : t("project.archived"), "success");
+        showSnackbar(
+          archived ? t('project.unarchived') : t('project.archived'),
+          'success'
+        );
+        logInfo(`Proyecto ${!archived ? 'archivado' : 'desarchivado'}`, { projectId: id });
       })
-      .catch(() => {
-        showSnackbar(t("project.errorArchiving"), "error");
+      .catch((err) => {
+        showSnackbar(t('project.errorArchiving'), 'error');
+        logError('Error al archivar/desarchivar proyecto', err);
       });
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm(t("project.delete") + "?")) {
+    if (window.confirm(t('project.delete') + '?')) {
       const projectRef = ref(db, `projects/${id}`);
       remove(projectRef)
-        .then(() => showSnackbar(t("project.deleted"), "success"))
-        .catch(() => showSnackbar(t("project.errorDeleting"), "error"));
+        .then(() => {
+          showSnackbar(t('project.deleted'), 'success');
+          logInfo('Proyecto eliminado', { projectId: id });
+        })
+        .catch((err) => {
+          showSnackbar(t('project.errorDeleting'), 'error');
+          logError('Error al eliminar proyecto', err);
+        });
     }
   };
 
@@ -170,11 +182,24 @@ const Dashboard: React.FC = () => {
           {t("dashboard.noResults")}
         </Typography>
       ) : (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 3, mt: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            rowGap: 2,
+            justifyContent: "flex-start",
+            mt: 3,
+          }}
+        >
           {filteredProjects.map((project) => (
             <Box
               key={project.id}
-              sx={{ width: { xs: "100%", sm: "48%", md: "31%" }, flexShrink: 0 }}
+              sx={{
+                flex: "1 1 300px",
+                maxWidth: "calc(33.333% - 16px)", 
+                minWidth: "280px",
+              }}
             >
               <ProjectCard
                 id={project.id}

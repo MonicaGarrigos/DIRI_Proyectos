@@ -57,7 +57,16 @@
     "renameError": "Error al renombrar la columna",
     "deleteColumnSuccess": "Columna eliminada con éxito",
     "deleteColumnError": "Error al eliminar la columna",
-    "confirmDeleteColumn": "¿Estás seguro de que quieres eliminar esta columna?"
+    "confirmDeleteColumn": "¿Estás seguro de que quieres eliminar esta columna?",
+    "editTitle": "Editar Proyecto",
+    "newTitle": "Nuevo Proyecto",
+    "title": "Título",
+    "description": "Descripción",
+    "goal": "Objetivo",
+    "members": "Miembros",
+    "selectMembers": "Selecciona miembros",
+    "saveChanges": "Guardar cambios",
+    "create": "Crear"
   },
   "task": {
     "confirmDelete": "¿Estás seguro de que quieres eliminar esta tarea?",
@@ -104,7 +113,8 @@
     "auth/email-already-in-use": "Ese correo ya está registrado.",
     "password-mismatch": "Las contraseñas no coinciden.",
     "default": "Ocurrió un error inesperado. Intenta nuevamente.",
-    "auth/invalid-credential": "Correo o contraseña incorrectos."
+    "auth/invalid-credential": "Correo o contraseña incorrectos.",
+    "missing-fields": "Faltan campos obligatorios."
   },
   "admin": {
     "userManagement": "Gestión de Usuarios",

@@ -20,6 +20,7 @@ import { ref, get, update, remove } from "firebase/database";
 import type { Project } from "../types/project";
 import type { Task } from "../types/task";
 import type { User } from "../types/user";
+import { logInfo } from "../utils/logger";
 
 const ProjectDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -115,6 +116,11 @@ const ProjectDetail: React.FC = () => {
 
     const taskRef = ref(db, `tasks/${draggableId}`);
     await update(taskRef, { status: destination.droppableId });
+    logInfo('Tarea movida', {
+      taskId: draggableId,
+      from: source.droppableId,
+      to: destination.droppableId
+    });
     await loadProject();
   };
 

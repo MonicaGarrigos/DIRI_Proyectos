@@ -1,64 +1,64 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
-import LoginPage from "./components/LoginPage";
-import Dashboard from "./pages/Dashboard";
 import { useAppSelector } from "./redux/hooks";
-import ProjectDetail from "./pages/ProjectDetail";
 import TopBar from "./components/TopBar";
-import Profile from "./pages/Profile";
-import AdminPanel from "./components/AdminPanel";
 
 const App: React.FC = () => {
   const user = useAppSelector((state) => state.auth.user);
   console.log("App.tsx - user desde Redux:", user); // DEBUG
+  const LoginPage = React.lazy(() => import("./components/LoginPage"));
+  const Dashboard = React.lazy(() => import("./pages/Dashboard"));
+  const ProjectDetail = React.lazy(() => import("./pages/ProjectDetail"));
+  const Profile = React.lazy(() => import("./pages/Profile"));
+  const AdminPanel = React.lazy(() => import("./components/AdminPanel"));
 
   return (
     <>
       {user && <TopBar />}
-      <Routes>
-        {/* Ruta pública */}
-        <Route path="/login" element={<LoginPage />} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Routes>
+          {/* Ruta pública */}
+          <Route path="/login" element={<LoginPage />} />
 
-        {/* Rutas privadas */}
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/project/:id"
-          element={
-            <PrivateRoute>
-              <ProjectDetail />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
+          {/* Rutas privadas */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/project/:id"
+            element={
+              <PrivateRoute>
+                <ProjectDetail />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute requireAdmin>
+                <AdminPanel />
+              </PrivateRoute>
+            }
+          />
 
-        {/* Ruta solo para administradores */}
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute requireAdmin>
-              <AdminPanel />
-            </PrivateRoute>
-          }
-        />
-
-        {/* Redirección por defecto */}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
-      </Routes>
+          {/* Redirección por defecto */}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+      </Suspense>
     </>
   );
 };

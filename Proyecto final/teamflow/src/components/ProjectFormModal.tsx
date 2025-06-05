@@ -7,12 +7,14 @@ import {
   TextField,
   Button,
   Autocomplete,
-  CircularProgress
+  CircularProgress,
 } from "@mui/material";
 import { db } from "../firebase/firebase";
 import { ref, onValue, push, set, update } from "firebase/database";
 import { useAppSelector } from "../redux/hooks";
 import type { AuthUser } from "../redux/slices/authSlice";
+import { logError, logInfo } from "../utils/logger";
+import { useTranslation } from "react-i18next";
 
 interface ProjectToEdit {
   id: string;
@@ -31,6 +33,7 @@ interface Props {
 }
 
 const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectToEdit }) => {
+  const { t } = useTranslation();
   const user = useAppSelector((state) => state.auth.user);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -39,7 +42,6 @@ const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectTo
   const [selectedMembers, setSelectedMembers] = useState<AuthUser[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
 
-  // Cargar usuarios activos para selección
   useEffect(() => {
     const usersRef = ref(db, "users");
     onValue(usersRef, (snapshot) => {
@@ -52,7 +54,7 @@ const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectTo
             email: value.email,
             displayName: value.displayName || `${value.firstName} ${value.lastName}`,
             photoURL: value.photoURL || null,
-            role: value.role
+            role: value.role,
           }));
         setMembers(members);
       }
@@ -60,7 +62,6 @@ const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectTo
     });
   }, []);
 
-  // Prellenar campos si estamos editando
   useEffect(() => {
     if (projectToEdit) {
       setName(projectToEdit.name);
@@ -82,7 +83,7 @@ const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectTo
 
     const memberMap = {
       [projectToEdit?.owner || user.uid]: true,
-      ...Object.fromEntries(selectedMembers.map((m) => [m.uid, true]))
+      ...Object.fromEntries(selectedMembers.map((m) => [m.uid, true])),
     };
 
     const projectData = {
@@ -90,42 +91,46 @@ const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectTo
       description,
       goal,
       owner: projectToEdit?.owner || user.uid,
-      members: memberMap
+      members: memberMap,
     };
 
     try {
       if (projectToEdit) {
         const projectRef = ref(db, `projects/${projectToEdit.id}`);
         await update(projectRef, projectData);
+        logInfo("Proyecto actualizado", { id: projectToEdit.id, ...projectData });
       } else {
-        const projectRef = push(ref(db, "projects"));
-        await set(projectRef, {
+        const newProjectRef = push(ref(db, "projects"));
+        await set(newProjectRef, {
           ...projectData,
           createdAt: Date.now(),
-          archived: false
+          archived: false,
         });
+        logInfo("Nuevo proyecto creado", { id: newProjectRef.key, ...projectData });
       }
 
       onClose();
-      if (onSuccess) onSuccess();
+      onSuccess?.();
     } catch (err) {
-      console.error("Error al guardar proyecto:", err);
+      logError("Error al guardar proyecto", err);
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{projectToEdit ? "Editar Proyecto" : "Nuevo Proyecto"}</DialogTitle>
+      <DialogTitle>
+        {projectToEdit ? t("project.editTitle") : t("project.newTitle")}
+      </DialogTitle>
       <DialogContent>
         <TextField
-          label="Título"
+          label={t("project.title")}
           fullWidth
           margin="normal"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
         <TextField
-          label="Descripción"
+          label={t("project.description")}
           fullWidth
           margin="normal"
           multiline
@@ -134,7 +139,7 @@ const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectTo
           onChange={(e) => setDescription(e.target.value)}
         />
         <TextField
-          label="Objetivo"
+          label={t("project.goal")}
           fullWidth
           margin="normal"
           multiline
@@ -152,8 +157,8 @@ const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectTo
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Miembros"
-              placeholder="Selecciona miembros"
+              label={t("project.members")}
+              placeholder={t("project.selectMembers")}
               margin="normal"
               InputProps={{
                 ...params.InputProps,
@@ -162,16 +167,16 @@ const ProjectFormModal: React.FC<Props> = ({ open, onClose, onSuccess, projectTo
                     {loadingUsers ? <CircularProgress color="inherit" size={20} /> : null}
                     {params.InputProps.endAdornment}
                   </>
-                )
+                ),
               }}
             />
           )}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
+        <Button onClick={onClose}>{t("common.cancel")}</Button>
         <Button variant="contained" onClick={handleSubmit}>
-          {projectToEdit ? "Guardar cambios" : "Crear"}
+          {projectToEdit ? t("project.saveChanges") : t("project.create")}
         </Button>
       </DialogActions>
     </Dialog>

@@ -106,7 +106,7 @@ const KanbanColumn: React.FC<Props> = ({
               autoFocus />
           ) : (
             <Typography variant="h6" fontWeight={700} color="text.primary">
-              {title}
+              {t(`project.columns.${columnKey}`, { defaultValue: title })}
               {!isProtected && (
                 <>
                   <IconButton size="small" onClick={() => setEditing(true)}>

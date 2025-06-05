@@ -14,6 +14,7 @@ import { db } from "../firebase/firebase";
 import { ref, push, set, serverTimestamp, update } from "firebase/database";
 import type { User } from "../types/user";
 import type { Task } from "../types/task";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   open: boolean;
@@ -34,6 +35,7 @@ const TaskModal: React.FC<Props> = ({
   projectMembers,
   taskToEdit
 }) => {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
@@ -101,10 +103,12 @@ const TaskModal: React.FC<Props> = ({
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <form onSubmit={handleSubmit}>
-        <DialogTitle>{taskToEdit ? "Editar tarea" : "Nueva tarea"}</DialogTitle>
+        <DialogTitle>
+          {taskToEdit ? t("task.edit") : t("project.addTask")}
+        </DialogTitle>
         <DialogContent>
           <TextField
-            label="Título"
+            label={t("task.title")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             fullWidth
@@ -113,7 +117,7 @@ const TaskModal: React.FC<Props> = ({
           />
 
           <TextField
-            label="Descripción"
+            label={t("task.description")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             fullWidth
@@ -124,15 +128,15 @@ const TaskModal: React.FC<Props> = ({
 
           <TextField
             select
-            label="Prioridad"
+            label={t("task.priority")}
             value={priority}
             onChange={(e) => setPriority(e.target.value as "low" | "medium" | "high")}
             fullWidth
             margin="normal"
           >
-            <MenuItem value="low">Baja</MenuItem>
-            <MenuItem value="medium">Media</MenuItem>
-            <MenuItem value="high">Alta</MenuItem>
+            <MenuItem value="low">{t("task.priorityLow")}</MenuItem>
+            <MenuItem value="medium">{t("task.priorityMedium")}</MenuItem>
+            <MenuItem value="high">{t("task.priorityHigh")}</MenuItem>
           </TextField>
 
           <Autocomplete
@@ -145,17 +149,17 @@ const TaskModal: React.FC<Props> = ({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Asignar a"
+                label={t("task.assignTo")}
                 margin="normal"
-                placeholder="Selecciona miembros"
+                placeholder={t("project.selectMembers")}
               />
             )}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Cancelar</Button>
+          <Button onClick={onClose}>{t("common.cancel")}</Button>
           <Button type="submit" variant="contained" disabled={loading}>
-            {taskToEdit ? "Guardar cambios" : "Crear"}
+            {taskToEdit ? t("common.save") : t("project.create")}
           </Button>
         </DialogActions>
       </form>

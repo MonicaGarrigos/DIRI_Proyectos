@@ -116,7 +116,16 @@
     "renameError": "Error renaming column",
     "deleteColumnSuccess": "Column deleted successfully",
     "deleteColumnError": "Error deleting column",
-    "confirmDeleteColumn": "Are you sure you want to delete this column?"
+    "confirmDeleteColumn": "Are you sure you want to delete this column?",
+     "editTitle": "Edit Project",
+    "newTitle": "New Project",
+    "title": "Title",
+    "description": "Description",
+    "goal": "Goal",
+    "members": "Members",
+    "selectMembers": "Select members",
+    "saveChanges": "Save changes",
+    "create": "Create"
   },
   "task": {
     "confirmDelete": "Are you sure you want to delete this task?",

@@ -11,6 +11,7 @@ import { db } from "../firebase/firebase";
 import styles from "../styles/AuthForm.module.css";
 import logo from "../assets/logo_login.png";
 import { Snackbar, Alert } from "@mui/material";
+import { logInfo, logError, logWarn } from "../utils/logger";
 
 const AuthForm: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -67,6 +68,7 @@ const AuthForm: React.FC = () => {
             message: t("authErrors.disabled-account"),
             severity: "error",
           });
+          logWarn(`Login attempt blocked for disabled user: ${email}`);
           return;
         }
 
@@ -85,6 +87,7 @@ const AuthForm: React.FC = () => {
           severity: "success",
         });
 
+        logInfo(`User logged in: ${email} (${firebaseUser.uid})`);
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         firebaseUser = userCredential.user;
@@ -104,16 +107,17 @@ const AuthForm: React.FC = () => {
           message: t("authSuccess.register"),
           severity: "success",
         });
+
+        logInfo(`New user registered: ${email} (${firebaseUser.uid})`);
       }
 
       dispatch(setError(null));
-
     } catch (error: any) {
       const code = error.code || "unknown";
       dispatch(setError(code));
-    } finally {
-      dispatch(setLoading(false));
+      logError(`Auth error [${isLogin ? "login" : "register"}]:`, code, error.message || error);
     }
+
   };
 
   return (
@@ -235,6 +239,7 @@ const AuthForm: React.FC = () => {
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert
+          role="alert"
           severity={snackbar.severity}
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           sx={{ width: "100%" }}

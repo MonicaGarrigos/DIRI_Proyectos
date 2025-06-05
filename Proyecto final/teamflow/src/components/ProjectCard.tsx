@@ -155,22 +155,31 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           </Typography>
         }
         subheader={
-          <Typography variant="body2" color="textSecondary">
-            {members
-              ? t("project.membersCount", { count: Object.keys(members).length })
-              : ""}
+          <Typography
+            variant="body2"
+            sx={{ color: archived ? "#555" : "white" }}
+          >
+            {members ? t("project.membersCount", { count: Object.keys(members).length }) : ""}
             {ownerId === currentUserId && (
-              <Typography variant="caption" color="primary" ml={1}>
+              <Typography
+                variant="caption"
+                sx={{ color: archived ? "#7e57c2" : "primary.main", ml: 1 }}
+              >
                 ({t("project.youAreOwner")})
               </Typography>
             )}
           </Typography>
+
         }
         action={
           <>
-            <IconButton onClick={handleMenuOpen}>
+            <IconButton
+              onClick={handleMenuOpen}
+              sx={{ color: archived ? "#555" : "#ffffff" }}
+            >
               <MoreVertIcon />
             </IconButton>
+
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
