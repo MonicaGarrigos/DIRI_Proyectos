@@ -9,8 +9,10 @@ import {
 } from "@mui/material";
 import { db } from "../firebase/firebase";
 import { ref, update, get } from "firebase/database";
+import { useTranslation } from "react-i18next";
 import type { Task, TaskPriority } from "../types/task";
 import type { User } from "../types/user";
+import { Snackbar, Alert } from "@mui/material";
 
 interface Props {
   open: boolean;
@@ -25,6 +27,15 @@ const EditTaskModal: React.FC<Props> = ({ open, task, onClose, onSave }) => {
   const [priority, setPriority] = useState<TaskPriority>(task.priority);
   const [members, setMembers] = useState<User[]>([]);
   const [assignedTo, setAssignedTo] = useState<User[]>([]);
+  const { t } = useTranslation();
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+    open: false,
+    message: "",
+    severity: "success"
+  });
+  const showSnackbar = (message: string, severity: "success" | "error" = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -56,48 +67,56 @@ const EditTaskModal: React.FC<Props> = ({ open, task, onClose, onSave }) => {
       assignedMap[user.uid] = true;
     });
 
-    await update(ref(db, `tasks/${task.id}`), {
-      title,
-      description,
-      priority,
-      assignedTo: assignedMap,
-    });
-    onSave();
+    try {
+      await update(ref(db, `tasks/${task.id}`), {
+        title,
+        description,
+        priority,
+        assignedTo: assignedMap,
+      });
+      showSnackbar(t("task.saveSuccess"));
+      onSave();
+    } catch (error) {
+      showSnackbar(t("task.saveError"), "error");
+    }
   };
 
+
   return (
-    <Box sx={{ display: open ? "block" : "none", p: 3, border: "1px solid #ccc", borderRadius: 2 }}>
+    <><Box sx={{ display: open ? "block" : "none", p: 3, border: "1px solid #ccc", borderRadius: 2 }}>
       <Typography variant="h6" gutterBottom>
-        Editar tarea
+        {t("task.edit")}
       </Typography>
+
       <TextField
-        label="Título"
+        label={t("task.title")}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         fullWidth
-        margin="normal"
-      />
+        margin="normal" />
+
       <TextField
-        label="Descripción"
+        label={t("task.description")}
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         fullWidth
         margin="normal"
         multiline
-        rows={3}
-      />
+        rows={3} />
+
       <TextField
         select
-        label="Prioridad"
+        label={t("task.priority")}
         value={priority}
         onChange={(e) => setPriority(e.target.value as TaskPriority)}
         fullWidth
         margin="normal"
       >
-        <MenuItem value="low">Baja</MenuItem>
-        <MenuItem value="medium">Media</MenuItem>
-        <MenuItem value="high">Alta</MenuItem>
+        <MenuItem value="low">{t("task.priorityLow")}</MenuItem>
+        <MenuItem value="medium">{t("task.priorityMedium")}</MenuItem>
+        <MenuItem value="high">{t("task.priorityHigh")}</MenuItem>
       </TextField>
+
       <Autocomplete
         multiple
         options={members}
@@ -105,14 +124,30 @@ const EditTaskModal: React.FC<Props> = ({ open, task, onClose, onSave }) => {
         value={assignedTo}
         onChange={(_, value) => setAssignedTo(value)}
         renderInput={(params) => (
-          <TextField {...params} label="Asignar a" margin="normal" fullWidth />
-        )}
-      />
+          <TextField {...params} label={t("task.assignTo")} margin="normal" fullWidth />
+        )} />
+
       <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
-        <Button onClick={onClose} sx={{ mr: 1 }}>Cancelar</Button>
-        <Button variant="contained" onClick={handleSave}>Guardar</Button>
+        <Button onClick={onClose} sx={{ mr: 1 }}>
+          {t("common.cancel")}
+        </Button>
+        <Button variant="contained" onClick={handleSave}>
+          {t("common.save")}
+        </Button>
       </Box>
     </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
+
   );
 };
 

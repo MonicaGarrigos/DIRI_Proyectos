@@ -111,10 +111,31 @@
       "inprogress": "In progress",
       "done": "Completed"
     },
-    "addTask": "Add task"
+    "addTask": "Add task",
+    "renameSuccess": "Column renamed successfully",
+    "renameError": "Error renaming column",
+    "deleteColumnSuccess": "Column deleted successfully",
+    "deleteColumnError": "Error deleting column",
+    "confirmDeleteColumn": "Are you sure you want to delete this column?"
   },
   "task": {
-    "confirmDelete": "Are you sure you want to delete this task?"
+    "confirmDelete": "Are you sure you want to delete this task?",
+    "edit": "Edit Task",
+    "title": "Title",
+    "description": "Description",
+    "priority": "Priority",
+    "priorityLow": "Low",
+    "priorityMedium": "Medium",
+    "priorityHigh": "High",
+    "assignTo": "Assign to",
+    "saveSuccess": "Task updated successfully",
+    "saveError": "Error updating task",
+    "deleteSuccess": "Task deleted successfully",
+    "deleteError": "Failed to delete the task"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "dashboard": {
     "title": "Your Projects",

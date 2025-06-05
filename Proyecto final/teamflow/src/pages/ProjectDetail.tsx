@@ -12,6 +12,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import AddIcon from "@mui/icons-material/Add";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { DragDropContext, Droppable, type DropResult } from "react-beautiful-dnd";
 import KanbanColumn from "../components/KanbanColumn";
 import TaskModal from "../components/TaskModal";
 import { db } from "../firebase/firebase";
@@ -41,41 +42,6 @@ const ProjectDetail: React.FC = () => {
     loadProject();
   }, [id]);
 
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchData = async () => {
-      try {
-        const projectSnap = await get(ref(db, `projects/${id}`));
-        const projectData: Project = projectSnap.val();
-        setProject(projectData);
-
-        if (projectData?.members) {
-          const userIds = Object.keys(projectData.members);
-          const usersSnap = await get(ref(db, "users"));
-          const usersData = usersSnap.val();
-
-          const filteredUsers = userIds
-            .map(uid => usersData?.[uid])
-            .filter(user => !!user);
-
-          setMembers(filteredUsers);
-        }
-
-        const tasksSnap = await get(ref(db, "tasks"));
-        const allTasks: Record<string, Task> = tasksSnap.val() || {};
-        const filteredTasks = Object.entries(allTasks)
-          .map(([tid, t]: any) => ({ id: tid, ...t }))
-          .filter((t: Task) => t.projectId === id);
-        setTasks(filteredTasks);
-      } catch (error) {
-        console.error("Error al cargar datos del proyecto:", error);
-      }
-    };
-
-    fetchData();
-  }, [id]);
-
   const loadProject = async () => {
     const snap = await get(ref(db, `projects/${id}`));
     if (!snap.exists()) return;
@@ -94,6 +60,18 @@ const ProjectDetail: React.FC = () => {
         .map(([tid, t]: any) => ({ id: tid, ...t }))
         .filter((t: Task) => t.projectId === id);
       setTasks(projectTasks);
+    }
+
+    if (data?.members) {
+      const userIds = Object.keys(data.members);
+      const usersSnap = await get(ref(db, "users"));
+      const usersData = usersSnap.val();
+
+      const filteredUsers = userIds
+        .map(uid => usersData?.[uid])
+        .filter(user => !!user);
+
+      setMembers(filteredUsers);
     }
   };
 
@@ -131,72 +109,84 @@ const ProjectDetail: React.FC = () => {
     await loadProject();
   };
 
+  const handleDragEnd = async (result: DropResult) => {
+    const { destination, source, draggableId } = result;
+    if (!destination || destination.droppableId === source.droppableId) return;
+
+    const taskRef = ref(db, `tasks/${draggableId}`);
+    await update(taskRef, { status: destination.droppableId });
+    await loadProject();
+  };
+
   return (
     <Box sx={{ px: 4, py: 3 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <IconButton onClick={() => navigate("/")}>
-          <ArrowBackIosNewIcon />
-        </IconButton>
-        <Typography variant="body1" sx={{ ml: 1 }}>
-          {t("project.backToMain")}
-        </Typography>
+        <IconButton onClick={() => navigate("/")}> <ArrowBackIosNewIcon /> </IconButton>
+        <Typography variant="body1" sx={{ ml: 1 }}> {t("project.backToMain")} </Typography>
       </Box>
 
       <Stack direction="row" alignItems="center" spacing={1} mb={1}>
         <FolderIcon fontSize="large" />
-        <Typography variant="h4" fontWeight={600}>
-          {project?.name}
-        </Typography>
+        <Typography variant="h4" fontWeight={600}> {project?.name} </Typography>
       </Stack>
 
       <Typography variant="subtitle1" sx={{ color: "text.secondary", mb: 3 }}>
         {project?.description}
       </Typography>
 
-      <Box display="flex" gap={2} overflow="auto" alignItems="flex-start">
-        {Object.entries(columns).map(([key, name]) => (
-          <KanbanColumn
-            key={key}
-            columnKey={key}
-            title={name}
-            tasks={tasks.filter((t) => t.status === key)}
-            onAddTask={() => handleAddTask(key)}
-            onRename={(newName) => handleRenameColumn(key, newName)}
-            reloadTasks={loadProject}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
-        ))}
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Box display="flex" gap={2} overflow="auto" alignItems="flex-start">
+          {Object.entries(columns).map(([key, name]) => (
+            <Droppable key={key} droppableId={key}>
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  <KanbanColumn
+                    columnKey={key}
+                    title={name}
+                    tasks={tasks.filter((t) => t.status === key)}
+                    onAddTask={() => handleAddTask(key)}
+                    onRename={(newName) => handleRenameColumn(key, newName)}
+                    onDeleteColumn={async () => {
+                      const updated = { ...columns };
+                      delete updated[key];
+                      await update(ref(db, `projects/${id}`), { columns: updated });
+                      setColumns(updated);
+                    }}
+                    reloadTasks={loadProject}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                  />
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          ))}
 
-        <Box minWidth={250} flexShrink={0}>
-          {addingColumn ? (
-            <Stack spacing={1}>
-              <TextField
-                label={t("project.newColumnLabel")}
-                value={newColumnName}
-                onChange={(e) => setNewColumnName(e.target.value)}
-                size="small"
-              />
-              <Button variant="contained" onClick={handleAddColumn}>
-                {t("project.add")}
+          <Box minWidth={250} flexShrink={0}>
+            {addingColumn ? (
+              <Stack spacing={1}>
+                <TextField
+                  label={t("project.newColumnLabel")}
+                  value={newColumnName}
+                  onChange={(e) => setNewColumnName(e.target.value)}
+                  size="small"
+                />
+                <Button variant="contained" onClick={handleAddColumn}> {t("project.add")} </Button>
+                <Button onClick={() => setAddingColumn(false)}> {t("project.cancel")} </Button>
+              </Stack>
+            ) : (
+              <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={() => setAddingColumn(true)}
+              >
+                {t("project.addColumn")}
               </Button>
-              <Button onClick={() => setAddingColumn(false)}>
-                {t("project.cancel")}
-              </Button>
-            </Stack>
-          ) : (
-            <Button
-              variant="outlined"
-              startIcon={<AddIcon />}
-              onClick={() => setAddingColumn(true)}
-            >
-              {t("project.addColumn")}
-            </Button>
-          )}
+            )}
+          </Box>
         </Box>
-      </Box>
+      </DragDropContext>
 
-      {/* Crear tarea */}
       <TaskModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -206,7 +196,6 @@ const ProjectDetail: React.FC = () => {
         projectMembers={members}
       />
 
-      {/* Editar tarea */}
       <TaskModal
         open={isEditOpen}
         onClose={() => setIsEditOpen(false)}

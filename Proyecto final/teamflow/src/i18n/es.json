@@ -52,10 +52,31 @@
       "inprogress": "En progreso",
       "done": "Completadas"
     },
-    "addTask": "Añadir tarea"
+    "addTask": "Añadir tarea",
+    "renameSuccess": "Columna renombrada con éxito",
+    "renameError": "Error al renombrar la columna",
+    "deleteColumnSuccess": "Columna eliminada con éxito",
+    "deleteColumnError": "Error al eliminar la columna",
+    "confirmDeleteColumn": "¿Estás seguro de que quieres eliminar esta columna?"
   },
   "task": {
-    "confirmDelete": "¿Estás seguro de que quieres eliminar esta tarea?"
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta tarea?",
+    "edit": "Editar tarea",
+    "title": "Título",
+    "description": "Descripción",
+    "priority": "Prioridad",
+    "priorityLow": "Baja",
+    "priorityMedium": "Media",
+    "priorityHigh": "Alta",
+    "assignTo": "Asignar a",
+    "saveSuccess": "Tarea actualizada correctamente",
+    "saveError": "Error al actualizar la tarea",
+    "deleteSuccess": "Tarea eliminada correctamente",
+    "deleteError": "Error al eliminar la tarea"
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Guardar"
   },
   "profile": {
     "title": "Perfil",

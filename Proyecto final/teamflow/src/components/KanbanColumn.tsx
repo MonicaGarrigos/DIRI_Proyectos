@@ -2,18 +2,21 @@ import {
   Box,
   Typography,
   IconButton,
-  Card,
-  Button,
   TextField,
-  Stack
+  Button,
+  Card,
+  Stack,
+  Alert,
+  Snackbar
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import AddIcon from "@mui/icons-material/Add";
 import { useState } from "react";
 import TaskCard from "./TaskCard";
 import type { Task } from "../types/task";
 import { useTranslation } from "react-i18next";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 
 interface Props {
   columnKey: string;
@@ -41,27 +44,46 @@ const KanbanColumn: React.FC<Props> = ({
   const [editing, setEditing] = useState(false);
   const [tempTitle, setTempTitle] = useState(title);
   const { t } = useTranslation();
-
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+    open: false,
+    message: "",
+    severity: "success"
+  });
   const protectedKeys = ["todo", "inprogress", "done"];
   const isProtected = protectedKeys.includes(columnKey);
 
-  const handleRename = () => {
+  const showSnackbar = (message: string, severity: "success" | "error" = "success") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleRename = async () => {
     if (!tempTitle.trim()) return;
-    onRename(tempTitle);
-    setEditing(false);
+    try {
+      await onRename(tempTitle);
+      setEditing(false);
+      showSnackbar(t("project.renameSuccess"));
+    } catch {
+      showSnackbar(t("project.renameError"), "error");
+    }
   };
 
   const handleDeleteColumn = async () => {
-    const confirmed = window.confirm(t("project.confirmDeleteColumn") || "Are you sure you want to delete this column?");
-    if (confirmed) await onDeleteColumn();
+    const confirmed = window.confirm(t("project.confirmDeleteColumn") || "Are you sure?");
+    if (!confirmed) return;
+    try {
+      await onDeleteColumn();
+      showSnackbar(t("project.deleteColumnSuccess"));
+    } catch {
+      showSnackbar(t("project.deleteColumnError"), "error");
+    }
   };
 
   return (
-    <Card
+    <><Card
       sx={{
         minWidth: 320,
         maxWidth: 350,
-        backgroundColor: "#fff",
+        backgroundColor: "#f5f5f5",
         p: 2,
         borderRadius: 3,
         boxShadow: 2,
@@ -81,8 +103,7 @@ const KanbanColumn: React.FC<Props> = ({
               onKeyDown={(e) => e.key === "Enter" && handleRename()}
               size="small"
               fullWidth
-              autoFocus
-            />
+              autoFocus />
           ) : (
             <Typography variant="h6" fontWeight={700} color="text.primary">
               {title}
@@ -100,17 +121,41 @@ const KanbanColumn: React.FC<Props> = ({
           )}
         </Box>
 
-        <Stack spacing={1} mt={1}>
-          {tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              reloadTasks={reloadTasks}
-              onEdit={() => onEdit(task)}
-              onDelete={() => onDelete(task.id!)}
-            />
-          ))}
-        </Stack>
+        <Droppable droppableId={columnKey}>
+          {(provided, snapshot) => (
+            <Stack
+              spacing={1}
+              mt={1}
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              sx={{
+                minHeight: 300,
+                backgroundColor: snapshot.isDraggingOver ? "#e3f2fd" : "transparent",
+                borderRadius: 2,
+                p: 1
+              }}
+            >
+              {tasks.map((task, index) => (
+                <Draggable key={task.id} draggableId={task.id!} index={index}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                    >
+                      <TaskCard
+                        task={task}
+                        reloadTasks={reloadTasks}
+                        onEdit={() => onEdit(task)}
+                        onDelete={() => onDelete(task.id!)} />
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </Stack>
+          )}
+        </Droppable>
       </Box>
 
       <Button
@@ -127,6 +172,17 @@ const KanbanColumn: React.FC<Props> = ({
         {t("project.addTask")}
       </Button>
     </Card>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity={snackbar.severity} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </>
   );
 };
 
