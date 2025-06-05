@@ -4,10 +4,13 @@ import { db } from "../firebase/firebase";
 import {
   Table, TableHead, TableBody, TableRow, TableCell,
   Typography, Container, Paper, CircularProgress,
-  Button, Snackbar, Alert, TextField, TablePagination
+  Button, Snackbar, Alert, TextField, TablePagination,
+  Box
 } from "@mui/material";
+import GroupIcon from "@mui/icons-material/Group";
 import { updateUserRole, toggleUserActive } from "../utils/userActions";
 import { useAppSelector } from "../redux/hooks";
+import { useTranslation } from "react-i18next";
 
 interface User {
   uid: string;
@@ -30,23 +33,20 @@ const AdminPanel: React.FC = () => {
   const usersPerPage = 5;
 
   const currentUser = useAppSelector((state) => state.auth.user);
+  const { t } = useTranslation();
 
   useEffect(() => {
-    console.log("🔄 Iniciando carga de usuarios...");
     const usersRef = ref(db, "users");
 
     const unsubscribe = onValue(
       usersRef,
       (snapshot) => {
-        console.log("📦 Datos recibidos de Firebase:", snapshot.val());
-
         const data = snapshot.val();
         const userList: User[] = [];
 
         for (const uid in data) {
           if (uid !== currentUser?.uid) {
             const user = data[uid];
-            console.log(`👤 Usuario procesado: ${user.firstName} ${user.lastName}`);
             userList.push({
               uid,
               email: user.email,
@@ -58,13 +58,11 @@ const AdminPanel: React.FC = () => {
           }
         }
 
-        console.log("✅ Usuarios finales procesados:", userList);
         setUsers(userList);
         setFilteredUsers(userList);
         setLoading(false);
       },
-      (error) => {
-        console.error("❌ Error al leer usuarios de Firebase:", error);
+      () => {
         setLoading(false);
       }
     );
@@ -78,7 +76,6 @@ const AdminPanel: React.FC = () => {
       `${u.firstName} ${u.lastName}`.toLowerCase().includes(query) ||
       u.email.toLowerCase().includes(query)
     );
-    console.log("🔍 Resultado búsqueda:", results);
     setFilteredUsers(results);
     setCurrentPage(0);
   }, [search, users]);
@@ -86,17 +83,17 @@ const AdminPanel: React.FC = () => {
   const handleRoleChange = async (uid: string, currentRole: string) => {
     const newRole = currentRole === "admin" ? "member" : "admin";
     await updateUserRole(uid, newRole);
-    setSnackbarMsg(`Rol cambiado a ${newRole}`);
+    setSnackbarMsg(t("admin.roleChanged", { role: newRole }));
   };
 
   const handleToggleActive = async (uid: string, currentStatus: boolean) => {
     if (uid === currentUser?.uid) {
-      setSnackbarMsg("No puedes desactivar tu propia cuenta.");
+      setSnackbarMsg(t("admin.cannotDeactivateSelf"));
       return;
     }
 
     await toggleUserActive(uid, currentStatus);
-    setSnackbarMsg(`Usuario ${currentStatus ? "desactivado" : "activado"}`);
+    setSnackbarMsg(currentStatus ? t("admin.userDeactivated") : t("admin.userActivated"));
   };
 
   const handleSort = (field: keyof User) => {
@@ -122,12 +119,15 @@ const AdminPanel: React.FC = () => {
 
   return (
     <Container sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Gestión de Usuarios
-      </Typography>
+      <Box display="flex" alignItems="center" gap={1} mb={2}>
+        <GroupIcon fontSize="large" color="primary" />
+        <Typography variant="h4" fontWeight={600}>
+          {t("admin.userManagement")}
+        </Typography>
+      </Box>
 
       <TextField
-        label="Buscar por nombre o email"
+        label={t("admin.search")}
         fullWidth
         sx={{ mb: 2 }}
         value={search}
@@ -137,23 +137,23 @@ const AdminPanel: React.FC = () => {
       {loading ? (
         <CircularProgress />
       ) : (
-        <Paper>
+        <Paper sx={{ overflowX: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow>
                 <TableCell onClick={() => handleSort("firstName")} style={{ cursor: "pointer" }}>
-                  Nombre {sortBy === "firstName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  {t("admin.name")} {sortBy === "firstName" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
                 </TableCell>
                 <TableCell onClick={() => handleSort("email")} style={{ cursor: "pointer" }}>
-                  Email {sortBy === "email" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  {t("admin.email")} {sortBy === "email" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
                 </TableCell>
                 <TableCell onClick={() => handleSort("role")} style={{ cursor: "pointer" }}>
-                  Rol {sortBy === "role" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  {t("admin.role")} {sortBy === "role" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
                 </TableCell>
                 <TableCell onClick={() => handleSort("active")} style={{ cursor: "pointer" }}>
-                  Estado {sortBy === "active" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
+                  {t("admin.status")} {sortBy === "active" ? (sortOrder === "asc" ? "↑" : "↓") : ""}
                 </TableCell>
-                <TableCell>Acciones</TableCell>
+                <TableCell>{t("admin.actions")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -161,25 +161,39 @@ const AdminPanel: React.FC = () => {
                 <TableRow key={user.uid}>
                   <TableCell>{user.firstName} {user.lastName}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>{user.active ? "Activo" : "Desactivado"}</TableCell>
+                  <TableCell>{t(`roles.${user.role}`)}</TableCell>
+                  <TableCell>{t(`status.${user.active ? "active" : "inactive"}`)}</TableCell>
                   <TableCell>
                     <Button
                       variant="outlined"
                       size="small"
                       onClick={() => handleRoleChange(user.uid, user.role)}
-                      sx={{ mr: 1 }}
+                      sx={{
+                        mr: 1,
+                        borderColor: '#8e44ad',
+                        color: '#8e44ad',
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        '&:hover': {
+                          backgroundColor: '#f7f0fb',
+                          borderColor: '#8e44ad',
+                        }
+                      }}
                       disabled={user.uid === currentUser?.uid}
                     >
-                      Cambiar a {user.role === "admin" ? "Miembro" : "Admin"}
+                      {t("admin.changeRole", {
+                        role: t(`roles.${user.role === "admin" ? "member" : "admin"}`)
+                      })}
                     </Button>
+
                     <Button
                       variant="outlined"
                       size="small"
-                      color={user.active ? "error" : "success"}
+                      color="error"
+                      sx={{ textTransform: 'none', fontWeight: 500 }}
                       onClick={() => handleToggleActive(user.uid, user.active!)}
                     >
-                      {user.active ? "Desactivar" : "Reactivar"}
+                      {user.active ? t("admin.deactivate") : t("admin.reactivate")}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -202,13 +216,19 @@ const AdminPanel: React.FC = () => {
         open={!!snackbarMsg}
         autoHideDuration={3000}
         onClose={() => setSnackbarMsg(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="info" onClose={() => setSnackbarMsg(null)}>
+        <Alert
+          severity={snackbarMsg?.toLowerCase().includes("error") ? "error" : "success"}
+          onClose={() => setSnackbarMsg(null)}
+          sx={{ width: '100%' }}
+        >
           {snackbarMsg}
         </Alert>
       </Snackbar>
     </Container>
   );
+
 };
 
 export default AdminPanel;

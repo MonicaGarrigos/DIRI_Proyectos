@@ -39,7 +39,7 @@ button {
   cursor: pointer;
 }
 
-input, textarea, select {
+input:not(.MuiInputBase-input), textarea, select {
   font-family: inherit;
   background-color: white;
   border: 1px solid var(--border-color);

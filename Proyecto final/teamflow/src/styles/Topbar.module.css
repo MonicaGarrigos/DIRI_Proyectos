@@ -1,10 +1,16 @@
 .container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 24px;
-  height: 64px;
-  cursor: default;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0 24px !important;
+  height: 64px !important;
+  background-color: var(--color-white) !important;
+}
+
+.appBar {
+  background-color: var(--color-white);
+  color: var(--color-text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .logoContainer {
@@ -15,39 +21,33 @@
 }
 
 .logoImage {
-  width: 36px;
-  height: 36px;
+  width: 45px;
+  height: 45px;
   object-fit: contain;
-}
-
-.navLinks {
-  display: flex;
-  gap: 16px;
-  align-items: center;
 }
 
 .profileMenu {
   display: flex;
   align-items: center;
-}
-
-
-.appBar {
-  background-color: #ffffff;
-  color: #2f3640;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.logo {
-  cursor: pointer;
-  height: 36px;
-}
-
-.navButton {
-  color: #4a90e2;
-  font-weight: 500;
+  gap: 16px;
 }
 
 .accountIcon {
-  color: #2f3640;
+  color: var(--color-text);
 }
+
+.profileMenu :global(.MuiFormControl-root) {
+  margin: 0;
+}
+
+.menuItem {
+  font-weight: 500;
+  color: var(--color-text);
+  transition: background-color 0.2s ease;
+}
+
+.menuItem:hover {
+  background-color: #f0f0f5;
+}
+
+

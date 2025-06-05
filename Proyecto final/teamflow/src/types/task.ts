@@ -1,13 +1,13 @@
-export type TaskStatus = "todo" | "inprogress" | "done";
+export type TaskStatus = "todo" | "inprogress" | "done" | string;
+export type TaskPriority = "low" | "medium" | "high";
 
 export interface Task {
-  id: string;
+  id?: string; 
   title: string;
-  description?: string;
-  priority?: string;
-  status: "todo" | "inprogress" | "done";
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignedTo: string; 
   projectId: string;
-  assignedTo?: string;
-  dueDate?: string;
-  attachmentUrl?: string; 
+  createdAt?: number | object; 
 }

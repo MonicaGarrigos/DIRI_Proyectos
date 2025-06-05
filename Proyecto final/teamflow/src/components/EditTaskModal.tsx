@@ -1,128 +1,118 @@
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  TextField,
-  MenuItem,
-  Divider,
-  Typography
-} from "@mui/material";
 import { useState, useEffect } from "react";
-import { ref, get } from "firebase/database";
+import {
+  Box,
+  TextField,
+  Button,
+  MenuItem,
+  Typography,
+  Autocomplete
+} from "@mui/material";
 import { db } from "../firebase/firebase";
-import { useParams } from "react-router-dom";
-import TaskAttachments from "./TaskAttachments";
-import type { Task } from "../types/task";
+import { ref, update, get } from "firebase/database";
+import type { Task, TaskPriority } from "../types/task";
 import type { User } from "../types/user";
-import TaskComments from "./TaskComments";
 
 interface Props {
   open: boolean;
-  task: Task | null;
+  task: Task;
   onClose: () => void;
-  onSave: (updated: Task) => void;
+  onSave: () => void;
 }
 
 const EditTaskModal: React.FC<Props> = ({ open, task, onClose, onSave }) => {
-  const { id: projectId } = useParams<{ id: string }>();
-  const [form, setForm] = useState<Task | null>(task);
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description);
+  const [priority, setPriority] = useState<TaskPriority>(task.priority);
   const [members, setMembers] = useState<User[]>([]);
-
-  useEffect(() => {
-    setForm(task);
-  }, [task]);
+  const [assignedTo, setAssignedTo] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchMembers = async () => {
-      if (!projectId) return;
-      const projectSnap = await get(ref(db, `projects/${projectId}`));
+      const projectSnap = await get(ref(db, `projects/${task.projectId}`));
       const usersSnap = await get(ref(db, "users"));
       if (projectSnap.exists() && usersSnap.exists()) {
         const project = projectSnap.val();
         const users = usersSnap.val();
-
         const projectMembers = Object.keys(project.members || {}).map((uid) => ({
           uid,
           ...users[uid],
         }));
-
         setMembers(projectMembers);
+
+        const currentAssignees = Object.keys(task.assignedTo || {}).map((uid) => ({
+          uid,
+          ...users[uid]
+        }));
+        setAssignedTo(currentAssignees);
       }
     };
 
     fetchMembers();
-  }, [projectId]);
+  }, [task]);
 
-  const handleChange = (field: keyof Task, value: any) => {
-    setForm((prev) => prev ? { ...prev, [field]: value } : prev);
+  const handleSave = async () => {
+    const assignedMap: { [key: string]: true } = {};
+    assignedTo.forEach((user) => {
+      assignedMap[user.uid] = true;
+    });
+
+    await update(ref(db, `tasks/${task.id}`), {
+      title,
+      description,
+      priority,
+      assignedTo: assignedMap,
+    });
+    onSave();
   };
 
-  if (!form) return null;
-
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Editar tarea</DialogTitle>
-      <DialogContent>
-        <TextField
-          label="Título"
-          fullWidth
-          margin="normal"
-          value={form.title}
-          onChange={(e) => handleChange("title", e.target.value)}
-        />
-        <TextField
-          label="Descripción"
-          fullWidth
-          multiline
-          margin="normal"
-          value={form.description}
-          onChange={(e) => handleChange("description", e.target.value)}
-        />
-        <TextField
-          select
-          label="Prioridad"
-          fullWidth
-          margin="normal"
-          value={form.priority}
-          onChange={(e) => handleChange("priority", e.target.value)}
-        >
-          <MenuItem value="low">Baja</MenuItem>
-          <MenuItem value="medium">Media</MenuItem>
-          <MenuItem value="high">Alta</MenuItem>
-        </TextField>
-        <TextField
-          select
-          label="Asignar a"
-          fullWidth
-          margin="normal"
-          value={form.assignedTo}
-          onChange={(e) => handleChange("assignedTo", e.target.value)}
-        >
-          {members.map((member) => (
-            <MenuItem key={member.uid} value={member.uid}>
-              {member.displayName || member.email}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        <Divider sx={{ my: 3 }} />
-        <Typography variant="h6" gutterBottom>Comentarios</Typography>
-        <TaskComments taskId={form.id} />
-
-        <Divider sx={{ my: 3 }} />
-        <Typography variant="h6" gutterBottom>Archivos adjuntos</Typography>
-        <TaskAttachments taskId={form.id} />
-      </DialogContent>
-
-      <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button onClick={() => form && onSave(form)} variant="contained">
-          Guardar
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <Box sx={{ display: open ? "block" : "none", p: 3, border: "1px solid #ccc", borderRadius: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Editar tarea
+      </Typography>
+      <TextField
+        label="Título"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        fullWidth
+        margin="normal"
+      />
+      <TextField
+        label="Descripción"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        fullWidth
+        margin="normal"
+        multiline
+        rows={3}
+      />
+      <TextField
+        select
+        label="Prioridad"
+        value={priority}
+        onChange={(e) => setPriority(e.target.value as TaskPriority)}
+        fullWidth
+        margin="normal"
+      >
+        <MenuItem value="low">Baja</MenuItem>
+        <MenuItem value="medium">Media</MenuItem>
+        <MenuItem value="high">Alta</MenuItem>
+      </TextField>
+      <Autocomplete
+        multiple
+        options={members}
+        getOptionLabel={(option) => option.displayName || option.email}
+        value={assignedTo}
+        onChange={(_, value) => setAssignedTo(value)}
+        renderInput={(params) => (
+          <TextField {...params} label="Asignar a" margin="normal" fullWidth />
+        )}
+      />
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 2 }}>
+        <Button onClick={onClose} sx={{ mr: 1 }}>Cancelar</Button>
+        <Button variant="contained" onClick={handleSave}>Guardar</Button>
+      </Box>
+    </Box>
   );
 };
 

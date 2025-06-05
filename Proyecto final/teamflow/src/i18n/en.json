@@ -41,5 +41,36 @@
     "auth/email-already-in-use": "That email is already in use.",
     "password-mismatch": "Passwords do not match.",
     "default": "An unexpected error occurred. Please try again."
+  },
+  "admin": {
+    "userManagement": "User Management",
+    "search": "Search by name or email",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "actions": "Actions",
+    "changeRole": "Change to {{role}}",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "userDeactivated": "User deactivated",
+    "userActivated": "User activated",
+    "roleChanged": "Role changed to {{role}}",
+    "cannotDeactivateSelf": "You can't deactivate your own account."
+  },
+  "roles": {
+    "admin": "Administrator",
+    "member": "Member"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "topbar": {
+    "profile": "Profile",
+    "logout": "Log out"
+  },
+  "language": {
+    "label": "Language"
   }
 }

@@ -1,138 +1,213 @@
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ref, get, update, remove } from "firebase/database";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Button,
+  TextField,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent
+} from "@mui/material";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import { useParams, useNavigate } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
+import KanbanColumn from "../components/KanbanColumn";
+import TaskModal from "../components/TaskModal";
 import { db } from "../firebase/firebase";
-import { Box, Typography } from "@mui/material";
-import TaskColumn from "../components/TaskColumn";
-import TaskForm from "../components/TaskForm";
-import EditTaskModal from "../components/EditTaskModal";
+import { ref, get, update, remove } from "firebase/database";
 import type { Project } from "../types/project";
-import type { Task, TaskStatus } from "../types/task";
+import type { Task } from "../types/task";
+import type { User } from "../types/user";
 
 const ProjectDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [project, setProject] = useState<Project | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [columns, setColumns] = useState<Record<string, string>>({});
+  const [selectedColumn, setSelectedColumn] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [newColumnName, setNewColumnName] = useState("");
+  const [addingColumn, setAddingColumn] = useState(false);
+  const navigate = useNavigate();
+  const [members, setMembers] = useState<User[]>([]);
 
-  const statusOrder: TaskStatus[] = ["todo", "inprogress", "done"];
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
-    fetchProjectAndTasks();
+    loadProject();
   }, [id]);
 
-  const fetchProjectAndTasks = async () => {
-    const projectSnap = await get(ref(db, `projects/${id}`));
-    setProject(projectSnap.exists() ? projectSnap.val() : null);
+  useEffect(() => {
+    if (!id) return;
 
-    const tasksSnap = await get(ref(db, "tasks"));
-    if (tasksSnap.exists()) {
-      const data = tasksSnap.val();
-      const filtered = Object.entries(data)
-        .map(([taskId, task]: any) => ({ id: taskId, ...task }))
-        .filter((task) => task.projectId === id);
-      setTasks(filtered);
-    } else {
-      setTasks([]);
+    const fetchData = async () => {
+      try {
+        const projectSnap = await get(ref(db, `projects/${id}`));
+        const projectData: Project = projectSnap.val();
+        setProject(projectData);
+
+        if (projectData?.members) {
+          const userIds = Object.keys(projectData.members);
+          const usersSnap = await get(ref(db, "users"));
+          const usersData = usersSnap.val();
+
+          const filteredUsers = userIds
+            .map(uid => usersData?.[uid])
+            .filter(user => !!user);
+
+          setMembers(filteredUsers);
+        }
+
+        const tasksSnap = await get(ref(db, "tasks"));
+        const allTasks: Record<string, Task> = tasksSnap.val() || {};
+        const filteredTasks = Object.entries(allTasks)
+          .map(([tid, t]: any) => ({ id: tid, ...t }))
+          .filter((t: Task) => t.projectId === id);
+        setTasks(filteredTasks);
+      } catch (error) {
+        console.error("Error al cargar datos del proyecto:", error);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  const handleEdit = (task: Task) => {
+    setEditingTask(task);
+    setIsEditOpen(true);
+  };
+
+  const handleDelete = async (taskId: string) => {
+    const confirmed = window.confirm("¿Estás seguro de que quieres eliminar esta tarea?");
+    if (!confirmed) return;
+    await remove(ref(db, `tasks/${taskId}`));
+    await loadProject();
+  };
+
+  const loadProject = async () => {
+    const snap = await get(ref(db, `projects/${id}`));
+    if (!snap.exists()) return;
+    const data = snap.val();
+    setProject(data);
+    setColumns(data.columns || {
+      todo: "Por hacer",
+      inprogress: "En progreso",
+      done: "Completadas"
+    });
+
+    const taskSnap = await get(ref(db, "tasks"));
+    if (taskSnap.exists()) {
+      const all = taskSnap.val();
+      const projectTasks = Object.entries(all)
+        .map(([tid, t]: any) => ({ id: tid, ...t }))
+        .filter((t: Task) => t.projectId === id);
+      setTasks(projectTasks);
     }
   };
 
-  const handleMoveTask = async (taskId: string, direction: "left" | "right") => {
-    const task = tasks.find((t) => t.id === taskId);
-    if (!task) return;
-
-    const currentIndex = statusOrder.indexOf(task.status);
-    const newIndex = direction === "left" ? currentIndex - 1 : currentIndex + 1;
-    const newStatus = statusOrder[newIndex];
-    if (!newStatus) return;
-
-    try {
-      await update(ref(db, `tasks/${taskId}`), { status: newStatus });
-      fetchProjectAndTasks();
-    } catch (error) {
-      console.error("Error al mover tarea:", error);
-    }
+  const handleAddTask = (column: string) => {
+    setSelectedColumn(column);
+    setModalOpen(true);
   };
 
-  const handleEditTask = (task: Task) => {
-    setSelectedTask(task);
-    setIsModalOpen(true);
+  const handleAddColumn = async () => {
+    if (!id || !newColumnName.trim()) return;
+    const key = newColumnName.toLowerCase().replace(/\s+/g, "_");
+    const updated = { ...columns, [key]: newColumnName };
+    await update(ref(db, `projects/${id}`), { columns: updated });
+    setColumns(updated);
+    setNewColumnName("");
+    setAddingColumn(false);
   };
 
-  const handleSaveTask = async (updated: Task) => {
-    try {
-      await update(ref(db, `tasks/${updated.id}`), {
-        title: updated.title,
-        description: updated.description,
-        priority: updated.priority
-      });
-      setIsModalOpen(false);
-      fetchProjectAndTasks();
-    } catch (error) {
-      console.error("Error al guardar tarea:", error);
-    }
+  const handleRenameColumn = async (key: string, newName: string) => {
+    if (!id) return;
+    const updated = { ...columns, [key]: newName };
+    await update(ref(db, `projects/${id}`), { columns: updated });
+    setColumns(updated);
   };
-
-  const handleDeleteTask = async (taskId: string) => {
-    const confirm = window.confirm("¿Estás seguro de que deseas eliminar esta tarea?");
-    if (!confirm) return;
-
-    try {
-      await remove(ref(db, `tasks/${taskId}`));
-      fetchProjectAndTasks();
-    } catch (error) {
-      console.error("Error al eliminar tarea:", error);
-    }
-  };
-
-  if (!project) {
-    return (
-      <Box sx={{ p: 4 }}>
-        <Typography variant="h6">Proyecto no encontrado</Typography>
-      </Box>
-    );
-  }
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>{project.name}</Typography>
-      <Typography variant="body1">{project.description}</Typography>
+    <>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <IconButton onClick={() => navigate('/')}>
+          <ArrowBackIosNewIcon />
+        </IconButton>
+        <Typography variant="h6">Volver a la página principal</Typography>
+      </Box>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" gutterBottom>
+          {project?.name}
+        </Typography>
+        <Typography variant="subtitle1" gutterBottom>
+          {project?.description}
+        </Typography>
 
-      <TaskForm onCreated={fetchProjectAndTasks} />
+        <Box display="flex" gap={2} overflow="auto" mt={4} alignItems="flex-start">
+          {Object.entries(columns).map(([key, name]) => (
+            <KanbanColumn
+              key={key}
+              columnKey={key}
+              title={name}
+              tasks={tasks.filter((t) => t.status === key)}
+              onAddTask={() => handleAddTask(key)}
+              onRename={(newName) => handleRenameColumn(key, newName)}
+              reloadTasks={loadProject}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
 
-      <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
-        <TaskColumn
-          title="To Do"
-          tasks={tasks.filter((t) => t.status === "todo")}
-          onMove={handleMoveTask}
-          onEdit={handleEditTask}
-          onDelete={handleDeleteTask}
+          <Box minWidth={250} flexShrink={0}>
+            {addingColumn ? (
+              <Stack spacing={1}>
+                <TextField
+                  label="Nombre columna"
+                  value={newColumnName}
+                  onChange={(e) => setNewColumnName(e.target.value)}
+                  size="small"
+                />
+                <Button variant="contained" onClick={handleAddColumn}>Añadir</Button>
+                <Button onClick={() => setAddingColumn(false)}>Cancelar</Button>
+              </Stack>
+            ) : (
+              <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={() => setAddingColumn(true)}
+              >
+                Añadir columna
+              </Button>
+            )}
+          </Box>
+        </Box>
+
+        {/* Modal de creación */}
+        <TaskModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          columnKey={selectedColumn}
+          projectId={id!}
+          onTaskCreated={loadProject}
+          projectMembers={members}
         />
-        <TaskColumn
-          title="In Progress"
-          tasks={tasks.filter((t) => t.status === "inprogress")}
-          onMove={handleMoveTask}
-          onEdit={handleEditTask}
-          onDelete={handleDeleteTask}
-        />
-        <TaskColumn
-          title="Done"
-          tasks={tasks.filter((t) => t.status === "done")}
-          onMove={handleMoveTask}
-          onEdit={handleEditTask}
-          onDelete={handleDeleteTask}
+
+        {/* Modal de edición */}
+        <TaskModal
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          columnKey={editingTask?.status || "todo"}
+          projectId={id!}
+          onTaskCreated={loadProject}
+          projectMembers={members}
+          taskToEdit={editingTask!}
         />
       </Box>
-
-      <EditTaskModal
-        open={isModalOpen}
-        task={selectedTask}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveTask}
-      />
-    </Box>
+    </>
   );
 };
 

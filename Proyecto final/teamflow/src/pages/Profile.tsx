@@ -3,7 +3,8 @@ import {
   Box,
   Button,
   Typography,
-  Stack
+  Stack,
+  Paper
 } from "@mui/material";
 import { useAppSelector, useAppDispatch } from "../redux/hooks";
 import { logout } from "../redux/slices/authSlice";
@@ -18,6 +19,8 @@ interface UserProfile {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  role?: string;
+  active?: boolean;
 }
 
 const Profile: React.FC = () => {
@@ -46,22 +49,49 @@ const Profile: React.FC = () => {
   if (!user) return <Typography>Cargando datos del perfil...</Typography>;
 
   return (
-    <Box sx={{ p: 4 }}>
-      <Typography variant="h4" gutterBottom>Perfil</Typography>
-
-      <Stack spacing={2} alignItems="center">
-        <Avatar sx={{ width: 120, height: 120 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 6 }}>
+      <Paper elevation={3} sx={{ p: 4, maxWidth: 400, width: '100%', textAlign: 'center', borderRadius: 4 }}>
+        <Avatar
+          sx={{
+            width: 120,
+            height: 120,
+            margin: '0 auto',
+            fontSize: '2rem',
+            bgcolor: '#8e44ad'
+          }}
+        >
           {user.firstName?.[0] || user.email?.[0]}
         </Avatar>
 
-        <Typography variant="body1"><strong>Nombre:</strong> {user.firstName} {user.lastName}</Typography>
-        <Typography variant="body1"><strong>Email:</strong> {user.email}</Typography>
-        <Typography variant="body1"><strong>Teléfono:</strong> {user.phone || "-"}</Typography>
+        <Typography variant="h5" mt={2} fontWeight={600}>
+          {user.firstName} {user.lastName}
+        </Typography>
 
-        <Button variant="contained" color="error" onClick={handleLogout}>
+        <Typography variant="body1" color="textSecondary" mt={1}>
+          <strong>Email:</strong> {user.email}
+        </Typography>
+
+        <Typography variant="body1" color="textSecondary">
+          <strong>Teléfono:</strong> {user.phone || "-"}
+        </Typography>
+
+        <Typography variant="body1" color="textSecondary">
+          <strong>Rol:</strong> {user.role}
+        </Typography>
+
+        <Typography variant="body1" color={user.active ? "green" : "red"}>
+          <strong>Estado:</strong> {user.active ? "Activo" : "Inactivo"}
+        </Typography>
+
+        <Button
+          variant="contained"
+          color="error"
+          onClick={handleLogout}
+          sx={{ mt: 3, borderRadius: 2 }}
+        >
           Cerrar sesión
         </Button>
-      </Stack>
+      </Paper>
     </Box>
   );
 };

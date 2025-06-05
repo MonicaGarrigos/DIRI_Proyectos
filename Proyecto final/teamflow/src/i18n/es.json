@@ -41,5 +41,36 @@
     "auth/email-already-in-use": "Ese correo ya está registrado.",
     "password-mismatch": "Las contraseñas no coinciden.",
     "default": "Ocurrió un error inesperado. Intenta nuevamente."
+  },
+  "admin": {
+    "userManagement": "Gestión de Usuarios",
+    "search": "Buscar por nombre o email",
+    "name": "Nombre",
+    "email": "Email",
+    "role": "Rol",
+    "status": "Estado",
+    "actions": "Acciones",
+    "changeRole": "Cambiar a {{role}}",
+    "deactivate": "Desactivar",
+    "reactivate": "Reactivar",
+    "userDeactivated": "Usuario desactivado",
+    "userActivated": "Usuario activado",
+    "roleChanged": "Rol cambiado a {{role}}",
+    "cannotDeactivateSelf": "No puedes desactivar tu propia cuenta."
+  },
+  "roles": {
+    "admin": "Administrador",
+    "member": "Miembro"
+  },
+  "status": {
+    "active": "Activo",
+    "inactive": "Inactivo"
+  },
+  "topbar": {
+    "profile": "Perfil",
+    "logout": "Cerrar sesión"
+  },
+  "language": {
+    "label": "Idioma"
   }
 }
