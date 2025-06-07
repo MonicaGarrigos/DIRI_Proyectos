@@ -4,15 +4,17 @@ import Foods from '../components/Foods';
 import { onValue, ref, set } from 'firebase/database';
 import { database } from '../firebaseConfig';
 import OrderList from '../components/OrderList';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import './Home.css';
-
+import { logout } from '../redux/authSlice';
+import { AppDispatch } from "../redux/store";
 
 function Home() {
   const [isChooseFoodPage, setIsChooseFoodPage] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
+  const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: RootState) => state.auth.user);
   const isAdmin = user?.role === 'admin';
 
@@ -97,14 +99,27 @@ function Home() {
     set(menuItemsRef, updatedItems);
   };
 
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap();
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
   return (
     <div className="App">
       <div className="top-bar">
         <button className="toggleButton" onClick={() => setIsChooseFoodPage(!isChooseFoodPage)}>
           {isChooseFoodPage ? 'Disponibilidad' : 'Pedir Comida'}
         </button>
-      </div>
 
+        {user && (
+          <button className="logoutButton" onClick={handleLogout}>
+            Cerrar sesión
+          </button>
+        )}
+      </div>
 
       <h3 className="title">Comida Rápida Online</h3>
 
@@ -124,7 +139,6 @@ function Home() {
                 </li>
               ))}
             </ul>
-
           )}
 
           <OrderList />

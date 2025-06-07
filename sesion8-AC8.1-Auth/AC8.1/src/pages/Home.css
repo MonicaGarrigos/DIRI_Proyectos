@@ -1,3 +1,16 @@
+.App {
+  padding-top: 3rem; 
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.top-bar {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .ulApp {
   list-style: none;
   padding: 0;

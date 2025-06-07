@@ -21,12 +21,17 @@ function FoodOrder(props: FoodOrderProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
 
+  const user = useSelector((state: RootState) => state.auth.user);
   const menuItems = useSelector((state: RootState) => state.menu.menu);
   const orderStatus = useSelector((state: RootState) => state.orders.status);
   const orderError = useSelector((state: RootState) => state.orders.error);
-
   const dispatch = useDispatch<AppDispatch>();
+
   const totalPrice = props.food.price * quantity;
+
+  if (!user) {
+    return <p>Debes iniciar sesión para poder hacer un pedido.</p>;
+  }
 
   const handleQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setQuantity(parseInt(event.target.value));
